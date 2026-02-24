@@ -1,21 +1,31 @@
 import React from 'react';
 
 const DatasetDescribe = ({ data }) => {
-  if (!data || data.length === 0) return null;
+  if (!data || data.length === 0) {
+    return (
+      <div className="card">
+        <div className="card-header">
+          <h5 className="card-title">📈 Dataset Statistics</h5>
+        </div>
+        <div className="card-body">
+          <p className="text-muted">No data available. Please upload a dataset first.</p>
+        </div>
+      </div>
+    );
+  }
 
   const columns = Object.keys(data[0]);
 
   // Get numeric columns
   const numericColumns = columns.filter(col => {
-    return data.every(row => {
-      const val = row[col];
-      return val !== null && val !== undefined && val !== '' && !isNaN(Number(val));
-    });
+    const values = data.map(row => row[col]).filter(val => val !== null && val !== undefined && val !== '');
+    const numericValues = values.filter(val => !isNaN(Number(val)));
+    return numericValues.length / values.length >= 0.8;
   });
 
   if (numericColumns.length === 0) {
     return (
-      <div className="dataset-describe-card">
+      <div className="card">
         <div className="card-header">
           <h5 className="card-title">📈 Dataset Statistics</h5>
         </div>
@@ -70,7 +80,7 @@ const DatasetDescribe = ({ data }) => {
   }).filter(stat => stat !== null);
 
   return (
-    <div className="dataset-describe-card">
+    <div className="card">
       <div className="card-header">
         <h5 className="card-title">📈 Dataset Statistics</h5>
       </div>

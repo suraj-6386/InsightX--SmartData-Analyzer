@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 
 const DataCleaningPanel = ({ data, onDataClean }) => {
-  const [cleaningResults, setCleaningResults] = useState({
-    nullsRemoved: 0,
-    duplicatesRemoved: 0,
-    spacesTrimmed: 0,
-    numericConverted: 0,
-    dateConverted: 0,
-    valuesFilled: 0
-  });
+  const [showConvertModal, setShowConvertModal] = useState(false);
+  const [showTreatNullModal, setShowTreatNullModal] = useState(false);
+  const [convertConfig, setConvertConfig] = useState({ column: '', targetType: '' });
+  const [treatNullConfig, setTreatNullConfig] = useState({ treatment: '' });
 
   const removeNulls = () => {
     const originalLength = data.length;
@@ -18,15 +14,7 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
       );
     });
     const nullsRemoved = originalLength - cleaned.length;
-    const newResults = { ...cleaningResults, nullsRemoved };
-    setCleaningResults(newResults);
-    onDataClean(cleaned, newResults);
-
-    if (nullsRemoved > 0) {
-      alert(`${nullsRemoved} null rows removed`);
-    } else {
-      alert('No null values found');
-    }
+    onDataClean(cleaned, { nullsRemoved }, 'removeNulls');
   };
 
   const removeDuplicates = () => {
@@ -39,147 +27,144 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
       return true;
     });
     const duplicatesRemoved = originalLength - cleaned.length;
-    const newResults = { ...cleaningResults, duplicatesRemoved };
-    setCleaningResults(newResults);
-    onDataClean(cleaned, newResults);
-
-    if (duplicatesRemoved > 0) {
-      alert(`${duplicatesRemoved} duplicate rows removed`);
-    } else {
-      alert('No duplicate rows found');
-    }
+    onDataClean(cleaned, { duplicatesRemoved }, 'removeDuplicates');
   };
 
-  const trimSpaces = () => {
-    let trimmedCount = 0;
+  const handleConvertDataType = () => {
+    if (!convertConfig.column || !convertConfig.targetType) {
+      alert('Please select both column and target data type');
+      return;
+    }
+
     const cleaned = data.map(row => {
-      const newRow = {};
-      Object.keys(row).forEach(key => {
-        const value = row[key];
-        if (typeof value === 'string') {
-          const trimmed = value.trim();
-          if (trimmed !== value) trimmedCount++;
-          newRow[key] = trimmed;
-        } else {
-          newRow[key] = value;
+      const newRow = { ...row };
+      const value = row[convertConfig.column];
+
+      if (value !== null && value !== undefined && value !== '') {
+        switch (convertConfig.targetType) {
+          case 'Number':
+            newRow[convertConfig.column] = Number(value);
+            break;
+          case 'String':
+            newRow[convertConfig.column] = String(value);
+            break;
+          case 'Date':
+            newRow[convertConfig.column] = new Date(value).toISOString().split('T')[0];
+            break;
+          case 'Boolean':
+            newRow[convertConfig.column] = Boolean(value);
+            break;
+          default:
+            break;
         }
-      });
+      }
+
       return newRow;
     });
 
-    const newResults = { ...cleaningResults, spacesTrimmed: trimmedCount };
-    setCleaningResults(newResults);
-    onDataClean(cleaned, newResults);
+    onDataClean(cleaned, {
+      column: convertConfig.column,
+      targetType: convertConfig.targetType
+    }, 'convertDataType');
 
-    if (trimmedCount > 0) {
-      alert(`${trimmedCount} spaces trimmed from string values`);
-    } else {
-      alert('No extra spaces found to trim');
-    }
+    setShowConvertModal(false);
+    setConvertConfig({ column: '', targetType: '' });
   };
 
-  const convertNumericColumns = () => {
-    if (!data || data.length === 0) return;
-
-    const columns = Object.keys(data[0]);
-    let convertedCount = 0;
-    const cleaned = data.map(row => {
-      const newRow = { ...row };
-      columns.forEach(col => {
-        const value = row[col];
-        if (value !== null && value !== undefined && value !== '') {
-          const numValue = Number(value);
-          if (!isNaN(numValue) && value.toString() !== numValue.toString()) {
-            newRow[col] = numValue;
-            convertedCount++;
-          }
-        }
-      });
-      return newRow;
-    });
-
-    const newResults = { ...cleaningResults, numericConverted: convertedCount };
-    setCleaningResults(newResults);
-    onDataClean(cleaned, newResults);
-
-    if (convertedCount > 0) {
-      alert(`${convertedCount} values converted to numeric type`);
-    } else {
-      alert('No values needed numeric conversion');
+  const handleTreatNulls = () => {
+    if (!treatNullConfig.treatment) {
+      alert('Please select a treatment method');
+      return;
     }
-  };
-
-  const convertDateColumns = () => {
-    if (!data || data.length === 0) return;
 
     const columns = Object.keys(data[0]);
-    let convertedCount = 0;
+    let rowsAffected = 0;
+
     const cleaned = data.map(row => {
       const newRow = { ...row };
-      columns.forEach(col => {
-        const value = row[col];
-        if (value !== null && value !== undefined && value !== '') {
-          const dateValue = new Date(value);
-          if (!isNaN(dateValue.getTime()) && value.toString() !== dateValue.toISOString()) {
-            newRow[col] = dateValue.toISOString().split('T')[0]; // Store as YYYY-MM-DD
-            convertedCount++;
-          }
-        }
-      });
-      return newRow;
-    });
+      let rowModified = false;
 
-    const newResults = { ...cleaningResults, dateConverted: convertedCount };
-    setCleaningResults(newResults);
-    onDataClean(cleaned, newResults);
-
-    if (convertedCount > 0) {
-      alert(`${convertedCount} values converted to date format`);
-    } else {
-      alert('No values needed date conversion');
-    }
-  };
-
-  const fillMissingValues = () => {
-    if (!data || data.length === 0) return;
-
-    const columns = Object.keys(data[0]);
-    let filledCount = 0;
-    const cleaned = data.map(row => {
-      const newRow = { ...row };
       columns.forEach(col => {
         const value = row[col];
         if (value === null || value === undefined || value === '' || value === 'null' || value === 'NULL') {
-          // For numeric columns, fill with mean; for others, fill with 'Unknown'
-          const columnValues = data.map(r => r[col]).filter(v =>
-            v !== null && v !== undefined && v !== '' && v !== 'null' && v !== 'NULL'
-          );
-
-          if (columnValues.length > 0 && columnValues.every(v => !isNaN(Number(v)))) {
-            // Numeric column - fill with mean
-            const numericValues = columnValues.map(v => Number(v));
-            const mean = numericValues.reduce((a, b) => a + b, 0) / numericValues.length;
-            newRow[col] = mean;
-          } else {
-            // Non-numeric column - fill with 'Unknown'
-            newRow[col] = 'Unknown';
+          switch (treatNullConfig.treatment) {
+            case 'mean': {
+              // Only for numeric columns
+              const numericValues = data.map(r => r[col]).filter(v =>
+                v !== null && v !== undefined && v !== '' && v !== 'null' && v !== 'NULL' && !isNaN(Number(v))
+              ).map(v => Number(v));
+              if (numericValues.length > 0) {
+                newRow[col] = numericValues.reduce((a, b) => a + b, 0) / numericValues.length;
+                rowModified = true;
+              }
+              break;
+            }
+            case 'median': {
+              const sortedValues = data.map(r => r[col]).filter(v =>
+                v !== null && v !== undefined && v !== '' && v !== 'null' && v !== 'NULL' && !isNaN(Number(v))
+              ).map(v => Number(v)).sort((a, b) => a - b);
+              if (sortedValues.length > 0) {
+                const mid = Math.floor(sortedValues.length / 2);
+                newRow[col] = sortedValues.length % 2 !== 0 ? sortedValues[mid] : (sortedValues[mid - 1] + sortedValues[mid]) / 2;
+                rowModified = true;
+              }
+              break;
+            }
+            case 'mode': {
+              const valueCounts = {};
+              data.forEach(r => {
+                const v = r[col];
+                if (v !== null && v !== undefined && v !== '' && v !== 'null' && v !== 'NULL') {
+                  valueCounts[v] = (valueCounts[v] || 0) + 1;
+                }
+              });
+              const mode = Object.keys(valueCounts).reduce((a, b) => valueCounts[a] > valueCounts[b] ? a : b);
+              newRow[col] = mode;
+              rowModified = true;
+              break;
+            }
+            case 'zero':
+              newRow[col] = 0;
+              rowModified = true;
+              break;
+            case 'blank':
+              newRow[col] = '';
+              rowModified = true;
+              break;
+            case 'remove':
+              // This will be handled by filtering later
+              break;
+            default:
+              break;
           }
-          filledCount++;
         }
       });
+
+      if (rowModified) rowsAffected++;
       return newRow;
     });
 
-    const newResults = { ...cleaningResults, valuesFilled: filledCount };
-    setCleaningResults(newResults);
-    onDataClean(cleaned, newResults);
-
-    if (filledCount > 0) {
-      alert(`${filledCount} missing values filled`);
-    } else {
-      alert('No missing values found to fill');
+    // If treatment is 'remove', filter out rows with null values
+    let finalData = cleaned;
+    if (treatNullConfig.treatment === 'remove') {
+      finalData = cleaned.filter(row => {
+        return !Object.values(row).some(value =>
+          value === null || value === undefined || value === '' || value === 'null' || value === 'NULL'
+        );
+      });
+      rowsAffected = cleaned.length - finalData.length;
     }
+
+    onDataClean(finalData, {
+      treatment: treatNullConfig.treatment,
+      rowsAffected
+    }, 'treatNulls');
+
+    setShowTreatNullModal(false);
+    setTreatNullConfig({ treatment: '' });
   };
+
+  const columns = data ? Object.keys(data[0]) : [];
 
   return (
     <div className="data-cleaning-panel">
@@ -193,82 +178,107 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
             <button className="btn btn-outline-danger w-100" onClick={removeNulls}>
               🗑️ Remove Null Values
             </button>
-            {cleaningResults.nullsRemoved > 0 && (
-              <div className="alert alert-danger small mt-2">
-                {cleaningResults.nullsRemoved} null rows removed
-              </div>
-            )}
           </div>
 
           <div className="col-md-6 col-lg-4">
             <button className="btn btn-outline-warning w-100" onClick={removeDuplicates}>
               🔄 Remove Duplicates
             </button>
-            {cleaningResults.duplicatesRemoved > 0 && (
-              <div className="alert alert-warning small mt-2">
-                {cleaningResults.duplicatesRemoved} duplicates removed
-              </div>
-            )}
           </div>
 
           <div className="col-md-6 col-lg-4">
-            <button className="btn btn-outline-info w-100" onClick={trimSpaces}>
-              ✂️ Trim Spaces
+            <button className="btn btn-outline-primary w-100" onClick={() => setShowConvertModal(true)}>
+              🔄 Convert Data Type
             </button>
-            {cleaningResults.spacesTrimmed > 0 && (
-              <div className="alert alert-info small mt-2">
-                {cleaningResults.spacesTrimmed} spaces trimmed
-              </div>
-            )}
           </div>
 
           <div className="col-md-6 col-lg-4">
-            <button className="btn btn-outline-success w-100" onClick={convertNumericColumns}>
-              🔢 Convert Numeric
+            <button className="btn btn-outline-success w-100" onClick={() => setShowTreatNullModal(true)}>
+              🔧 Treat Null Values
             </button>
-            {cleaningResults.numericConverted > 0 && (
-              <div className="alert alert-success small mt-2">
-                {cleaningResults.numericConverted} values converted
-              </div>
-            )}
-          </div>
-
-          <div className="col-md-6 col-lg-4">
-            <button className="btn btn-outline-primary w-100" onClick={convertDateColumns}>
-              📅 Convert Dates
-            </button>
-            {cleaningResults.dateConverted > 0 && (
-              <div className="alert alert-primary small mt-2">
-                {cleaningResults.dateConverted} values converted
-              </div>
-            )}
-          </div>
-
-          <div className="col-md-6 col-lg-4">
-            <button className="btn btn-outline-secondary w-100" onClick={fillMissingValues}>
-              🔧 Fill Missing Values
-            </button>
-            {cleaningResults.valuesFilled > 0 && (
-              <div className="alert alert-secondary small mt-2">
-                {cleaningResults.valuesFilled} values filled
-              </div>
-            )}
           </div>
         </div>
 
-        {(cleaningResults.nullsRemoved > 0 || cleaningResults.duplicatesRemoved > 0 ||
-          cleaningResults.spacesTrimmed > 0 || cleaningResults.numericConverted > 0 ||
-          cleaningResults.dateConverted > 0 || cleaningResults.valuesFilled > 0) && (
-          <div className="mt-3 p-3 bg-light rounded">
-            <h6>Cleaning Summary:</h6>
-            <ul className="list-unstyled small mb-0">
-              {cleaningResults.nullsRemoved > 0 && <li>• {cleaningResults.nullsRemoved} null rows removed</li>}
-              {cleaningResults.duplicatesRemoved > 0 && <li>• {cleaningResults.duplicatesRemoved} duplicate rows removed</li>}
-              {cleaningResults.spacesTrimmed > 0 && <li>• {cleaningResults.spacesTrimmed} spaces trimmed</li>}
-              {cleaningResults.numericConverted > 0 && <li>• {cleaningResults.numericConverted} values converted to numeric</li>}
-              {cleaningResults.dateConverted > 0 && <li>• {cleaningResults.dateConverted} values converted to dates</li>}
-              {cleaningResults.valuesFilled > 0 && <li>• {cleaningResults.valuesFilled} missing values filled</li>}
-            </ul>
+        {/* Convert Data Type Modal */}
+        {showConvertModal && (
+          <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Convert Data Type</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowConvertModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="form-label">Select Column</label>
+                    <select
+                      className="form-select"
+                      value={convertConfig.column}
+                      onChange={(e) => setConvertConfig({...convertConfig, column: e.target.value})}
+                    >
+                      <option value="">Choose column</option>
+                      {columns.map(col => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Target Data Type</label>
+                    <select
+                      className="form-select"
+                      value={convertConfig.targetType}
+                      onChange={(e) => setConvertConfig({...convertConfig, targetType: e.target.value})}
+                    >
+                      <option value="">Choose type</option>
+                      <option value="Number">Number</option>
+                      <option value="String">String</option>
+                      <option value="Date">Date</option>
+                      <option value="Boolean">Boolean</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowConvertModal(false)}>Cancel</button>
+                  <button type="button" className="btn btn-primary" onClick={handleConvertDataType}>Convert</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Treat Null Values Modal */}
+        {showTreatNullModal && (
+          <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Treat Null Values</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowTreatNullModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="form-label">Treatment Method</label>
+                    <select
+                      className="form-select"
+                      value={treatNullConfig.treatment}
+                      onChange={(e) => setTreatNullConfig({...treatNullConfig, treatment: e.target.value})}
+                    >
+                      <option value="">Choose treatment</option>
+                      <option value="mean">Fill with Mean (numeric)</option>
+                      <option value="median">Fill with Median</option>
+                      <option value="mode">Fill with Mode</option>
+                      <option value="zero">Fill with Zero</option>
+                      <option value="blank">Fill with Blank</option>
+                      <option value="remove">Remove Rows</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowTreatNullModal(false)}>Cancel</button>
+                  <button type="button" className="btn btn-primary" onClick={handleTreatNulls}>Apply Treatment</button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

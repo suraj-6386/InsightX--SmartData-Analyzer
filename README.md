@@ -11,15 +11,19 @@ A comprehensive ReactJS-based data analytics platform that rivals PowerBI, featu
 
 ### 🧹 Data Cleaning & Processing
 - **Interactive Cleaning Panel**: User-friendly interface for data preprocessing
-- **Null Value Handling**: Remove or fill missing values with visual feedback
-- **Duplicate Removal**: Automatic detection and removal of duplicate records
-- **Type Conversion**: Smart numeric column detection and conversion
-- **Real-time Feedback**: Toast notifications for all cleaning operations
+- **Remove Null Values**: Filter out rows with missing data
+- **Remove Duplicates**: Automatic detection and removal of duplicate records
+- **Convert Data Type**: Change column data types (Number, String, Date, Boolean)
+- **Treat Null Values**: 6 strategies - Fill with Mean/Median/Mode/Zero/Blank, or Remove Rows
+- **Real-time Feedback**: Targeted notifications for each cleaning action
+- **Instant Updates**: Dataset info and statistics refresh after cleaning
 
 ### 📊 Advanced Analytics
-- **KPI Dashboard**: Professional metrics cards displaying Total, Average, Max, Min values
-- **Dynamic Calculations**: Real-time KPI computation across all numeric columns
-- **Statistical Analysis**: Comprehensive data statistics and insights
+- **Dataset Information**: Pandas-style `.info()` showing rows, columns, types, missing values
+- **Dataset Statistics**: Pandas-style `.describe()` with count, mean, std, min, quartiles, max
+- **Auto-Generated Insights**: Smart analysis below each chart with statistical insights
+- **Dynamic Analysis**: Trends, correlations, and dominance patterns identified automatically
+- **Real-time Computation**: Statistics update instantly after data cleaning
 
 ### 📈 Interactive Visualizations (15+ Chart Types)
 - **Bar Charts**: Standard and stacked bar visualizations
@@ -48,11 +52,17 @@ A comprehensive ReactJS-based data analytics platform that rivals PowerBI, featu
 - **Column Filtering**: Real-time data filtering capabilities
 - **Export Ready**: Clean data preparation for downloads
 
+### � Download Features
+- **Data Export**: Download cleaned data as CSV or Excel
+- **Chart Export**: Download individual charts as PNG (2x resolution)
+- **PDF Reports**: Comprehensive analytics report with all visualizations
+- **Professional Output**: Publication-ready formats for all exports
+
 ### 📄 Professional Reporting
-- **PDF Export**: Comprehensive reports with charts, KPIs, and data tables
-- **Multi-page Layout**: Organized report structure with headers and footers
-- **High-Quality Rendering**: Crisp chart exports using html2canvas
-- **Custom Branding**: Professional report formatting
+- **PDF Export**: Comprehensive reports with insights and data tables
+- **Multi-page Layout**: Title page, data info, statistics, charts, and summary
+- **Dashboard Integration**: Export all active charts in single report
+- **Download Automation**: One-click report generation
 
 ## 🎨 UI/UX Highlights
 
@@ -136,8 +146,21 @@ npm run lint
 ### 1. Upload Data
 - Drag and drop CSV or Excel files onto the upload area
 - Supported formats: `.csv`, `.xlsx`, `.xls`
+- Automatic format detection and parsing
 
-### 2. Clean Data
+### 2. View Statistics
+- **Dataset Info**: See total rows, columns, data types, missing values
+- **Dataset Describe**: View statistical summary (mean, std, percentiles) for numeric columns
+- Both panels update automatically after data cleaning
+
+### 3. Clean Data
+- **Remove Null Values**: Click button to remove rows with missing values
+- **Remove Duplicates**: Click to remove duplicate records
+- **Convert Data Type**: Open modal to change column data types
+- **Treat Null Values**: Open modal to choose treatment strategy (mean, median, mode, zero, blank, or remove rows)
+- Each action shows targeted feedback message
+
+### 4. Create Charts
 - Use the cleaning panel to remove null values and duplicates
 - Convert columns to numeric types as needed
 - Receive real-time feedback on cleaning operations
@@ -324,6 +347,47 @@ The exported PDF includes:
 ## Troubleshooting
 
 ### Common Issues:
+## 📋 Complete Feature List - v2.0
+
+### ✅ Bug Fixes Completed
+- Y-axis dropdown now shows for all chart types
+- Data statistics always display after upload and cleaning
+- Cleaning notifications only show for selected action
+
+### ✅ New Features Added
+- **Convert Data Type**: Modal dialog to change column types (Number, String, Date, Boolean)
+- **Treat Null Values**: 6 strategies (Mean, Median, Mode, Zero, Blank, Remove Rows)
+- **Graph Download**: Download individual charts as PNG with single click
+- **Auto Insights**: AI-generated insights below each chart (trends, correlations, dominance)
+- **Data Export**: Download clean data as CSV or Excel
+- **Enhanced Statistics**: Pandas-style info and describe panels
+
+### ⚡ Performance & Quality
+- Zero ESLint errors
+- Successful production build
+- All 15 chart types functional
+- Responsive UI on all screen sizes
+- Real-time updates throughout
+
+## 🎓 Resume-Worthy Features
+
+This project demonstrates:
+- **Advanced React**: Functional components, custom hooks, state management
+- **Data Processing**: CSV/Excel parsing, cleaning algorithms, statistical analysis
+- **Visualization**: 15+ chart types, real-time rendering, interactive features
+- **UX/UI Design**: Professional SaaS interface, responsive layout, user feedback
+- **Full-Stack Logic**: Frontend + backend services (parsing, analysis, PDF generation)
+- **Code Quality**: Clean architecture, modular code, proper error handling
+- **DevOps**: Build configuration, linting, production optimization
+
+## 🌟 Standout Implementations
+
+1. **Smart Column Detection**: 80% threshold for numeric columns
+2. **Statistical Insights**: Automatic trend and correlation analysis
+3. **Data Validation**: Comprehensive cleaning with multiple strategies
+4. **PDF Reports**: Multi-page professional documents with all charts
+5. **Responsive Design**: Works excellently on all device sizes
+
 1. **Port 5173 already in use**: Change port with `npm run dev -- --port 3000`
 2. **Build errors**: Ensure Node.js version is compatible
 3. **File upload not working**: Check browser console for errors
@@ -334,6 +398,10 @@ The exported PDF includes:
 npm run build
 npm run preview
 ```
+
+## 📞 Support & Documentation
+
+For detailed implementation notes, see [FEATURES_IMPLEMENTED.md](./FEATURES_IMPLEMENTED.md)
 
 ## License
 

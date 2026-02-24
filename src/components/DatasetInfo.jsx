@@ -1,7 +1,18 @@
 import React from 'react';
 
 const DatasetInfo = ({ data }) => {
-  if (!data || data.length === 0) return null;
+  if (!data || data.length === 0) {
+    return (
+      <div className="card">
+        <div className="card-header">
+          <h5 className="card-title">📊 Dataset Information</h5>
+        </div>
+        <div className="card-body">
+          <p className="text-muted">No data available. Please upload a dataset first.</p>
+        </div>
+      </div>
+    );
+  }
 
   const columns = Object.keys(data[0]);
   const totalRows = data.length;
@@ -44,7 +55,7 @@ const DatasetInfo = ({ data }) => {
   const approxMemoryUsage = (totalRows * totalColumns * 8) / 1024; // Rough estimate in KB
 
   return (
-    <div className="dataset-info-card">
+    <div className="card">
       <div className="card-header">
         <h5 className="card-title">📊 Dataset Information</h5>
       </div>

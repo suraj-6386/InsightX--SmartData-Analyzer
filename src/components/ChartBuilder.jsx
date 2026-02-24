@@ -47,6 +47,89 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
     });
   };
 
+  const generateInsights = (chart, data) => {
+    if (!data || data.length === 0) return 'No data available for insights.';
+
+    try {
+      const insights = [];
+
+      if (chart.type === 'bar' || chart.type === 'line') {
+        // Analyze trends for bar/line charts
+        const aggregated = aggregateData(data, chart.xAxis, chart.yAxis, chart.aggregation);
+        if (aggregated.length > 1) {
+          const first = aggregated[0].value;
+          const last = aggregated[aggregated.length - 1].value;
+          const change = ((last - first) / first) * 100;
+
+          if (Math.abs(change) > 5) {
+            const direction = change > 0 ? 'increased' : 'decreased';
+            insights.push(`${chart.yAxis} ${direction} by ${Math.abs(change).toFixed(1)}% from ${aggregated[0].name} to ${aggregated[aggregated.length - 1].name}`);
+          }
+
+          // Find max value
+          const maxItem = aggregated.reduce((max, item) => item.value > max.value ? item : max);
+          insights.push(`${maxItem.name} shows the highest ${chart.yAxis} at ${maxItem.value.toFixed(2)}`);
+        }
+      } else if (chart.type === 'pie' || chart.type === 'donut') {
+        // Analyze pie/donut charts
+        const aggregated = aggregateData(data, chart.xAxis, chart.yAxis, chart.aggregation);
+        const total = aggregated.reduce((sum, item) => sum + item.value, 0);
+        const topItem = aggregated.reduce((max, item) => item.value > max.value ? item : max);
+
+        if (topItem.value / total > 0.3) {
+          insights.push(`${topItem.name} dominates with ${(topItem.value / total * 100).toFixed(1)}% of total ${chart.yAxis}`);
+        }
+      } else if (chart.type === 'scatter') {
+        // Analyze scatter plots
+        const xValues = data.map(row => Number(row[chart.xAxis])).filter(v => !isNaN(v));
+        const yValues = data.map(row => Number(row[chart.yAxis])).filter(v => !isNaN(v));
+
+        if (xValues.length > 0 && yValues.length > 0) {
+          // Calculate correlation coefficient
+          const n = Math.min(xValues.length, yValues.length);
+          const sumX = xValues.slice(0, n).reduce((a, b) => a + b, 0);
+          const sumY = yValues.slice(0, n).reduce((a, b) => a + b, 0);
+          const sumXY = xValues.slice(0, n).reduce((sum, x, i) => sum + x * yValues[i], 0);
+          const sumX2 = xValues.slice(0, n).reduce((sum, x) => sum + x * x, 0);
+          const sumY2 = yValues.slice(0, n).reduce((sum, y) => sum + y * y, 0);
+
+          const correlation = (n * sumXY - sumX * sumY) /
+            Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+
+          if (Math.abs(correlation) > 0.5) {
+            const strength = Math.abs(correlation) > 0.8 ? 'strong' : 'moderate';
+            const direction = correlation > 0 ? 'positive' : 'negative';
+            insights.push(`${strength} ${direction} correlation (${correlation.toFixed(2)}) between ${chart.xAxis} and ${chart.yAxis}`);
+          }
+        }
+      }
+
+      return insights.length > 0 ? insights.slice(0, 2).join('. ') : 'Data analysis shows consistent patterns across categories.';
+    } catch {
+      return 'Unable to generate insights for this chart type.';
+    }
+  };
+
+  const downloadChartImage = () => {
+    if (chartRef.current) {
+      const chartInstance = echarts.getInstanceByDom(chartRef.current);
+      if (chartInstance) {
+        const dataURL = chartInstance.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+          backgroundColor: '#ffffff'
+        });
+
+        const link = document.createElement('a');
+        link.download = `${chart.title || 'chart'}.png`;
+        link.href = dataURL;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  };
+
   const generateChartOption = useCallback((chart, data) => {
     const baseOption = {
       title: {
@@ -496,19 +579,33 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
     <div className="chart-card" onClick={onSelect}>
       <div className="chart-header d-flex justify-content-between align-items-center">
         <h6 className="mb-0">{chart.title}</h6>
-        <button
-          className="btn btn-sm btn-outline-danger"
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          title="Delete chart"
-        >
-          ×
-        </button>
+        <div className="d-flex gap-1">
+          <button
+            className="btn btn-sm btn-outline-primary"
+            onClick={(e) => { e.stopPropagation(); downloadChartImage(); }}
+            title="Download chart as PNG"
+          >
+            📥
+          </button>
+          <button
+            className="btn btn-sm btn-outline-danger"
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            title="Delete chart"
+          >
+            ×
+          </button>
+        </div>
       </div>
       <div
         ref={chartRef}
-        style={{ width: '100%', height: '350px' }}
+        style={{ width: '100%', height: '300px' }}
         className="chart-container"
       ></div>
+      <div className="chart-insights p-2 bg-light border-top">
+        <small className="text-muted">
+          <strong>💡 Insight:</strong> {generateInsights(chart, data)}
+        </small>
+      </div>
     </div>
   );
 };

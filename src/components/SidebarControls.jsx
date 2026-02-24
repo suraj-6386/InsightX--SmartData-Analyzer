@@ -40,9 +40,13 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
   ];
 
   const columns = data ? Object.keys(data[0]) : [];
-  const numericColumns = columns.filter(col =>
-    data && data.every(row => !isNaN(Number(row[col])) && row[col] !== '')
-  );
+  const numericColumns = columns.filter(col => {
+    if (!data || data.length === 0) return false;
+    // Check if at least 80% of non-empty values are numeric
+    const values = data.map(row => row[col]).filter(val => val !== null && val !== undefined && val !== '');
+    const numericValues = values.filter(val => !isNaN(Number(val)) && val !== '');
+    return numericValues.length / values.length >= 0.8;
+  });
   const categoricalColumns = columns.filter(col => !numericColumns.includes(col));
 
   const handleChartTypeChange = (newType) => {
