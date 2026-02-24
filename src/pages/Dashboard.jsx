@@ -163,14 +163,14 @@ function Dashboard() {
                         >
                           📥 Download Clean Data
                         </button>
-                        <ul className="dropdown-menu">
-                          <li><a className="dropdown-item" href="#" onClick={() => downloadCleanData('csv')}>📄 CSV Format</a></li>
-                          <li><a className="dropdown-item" href="#" onClick={() => downloadCleanData('excel')}>📊 Excel Format</a></li>
+                        <ul className="dropdown-menu dropdown-menu-end">
+                          <li><button type="button" className="dropdown-item" onClick={(e) => { e.preventDefault(); downloadCleanData('csv'); }}>📄 CSV Format</button></li>
+                          <li><button type="button" className="dropdown-item" onClick={(e) => { e.preventDefault(); downloadCleanData('excel'); }}>📊 Excel Format</button></li>
                         </ul>
                       </div>
                       <button
                         className="btn btn-success"
-                        onClick={() => generatePDFReport(currentData, charts)}
+                        onClick={() => { generatePDFReport(currentData, charts); }}
                         disabled={!currentData || charts.length === 0}
                       >
                         📄 Export PDF Report

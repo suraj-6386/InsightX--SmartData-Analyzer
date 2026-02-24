@@ -65,13 +65,13 @@ const DataTable = ({ data }) => {
   return (
     <div className="card mb-4">
       <div className="card-header">
-        <h5>Data Table</h5>
-        <div className="row mt-3">
+        <h5>📊 Data Table</h5>
+        <div className="row mt-4 g-2">
           <div className="col-md-4">
             <input
               type="text"
-              className="form-control"
-              placeholder="Search..."
+              className="form-control search-input"
+              placeholder="🔍 Search all columns..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -97,7 +97,7 @@ const DataTable = ({ data }) => {
           </div>
           <div className="col-md-2">
             <button className="btn btn-primary w-100" onClick={handleFilter}>
-              Apply
+              Apply Filter
             </button>
           </div>
         </div>
@@ -105,18 +105,35 @@ const DataTable = ({ data }) => {
       <div className="card-body">
         <div className="table-responsive">
           <table className="table table-striped table-hover">
-            <thead>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr>
                 {columns.map((col, index) => (
-                  <th key={index} onClick={() => handleSort(col)} style={{ cursor: 'pointer' }}>
-                    {col} {sortColumn === col && (sortDirection === 'asc' ? '↑' : '↓')}
+                  <th 
+                    key={index} 
+                    onClick={() => handleSort(col)} 
+                    style={{ 
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      backgroundColor: '#f8f9fa',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                  >
+                    {col} {sortColumn === col && (
+                      <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>
+                        {sortDirection === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {currentData.map((row, index) => (
-                <tr key={index}>
+                <tr key={index} style={{ 
+                  transition: 'all 0.2s ease'
+                }}>
                   {columns.map((col, colIndex) => (
                     <td key={colIndex}>{row[col]}</td>
                   ))}
@@ -125,29 +142,37 @@ const DataTable = ({ data }) => {
             </tbody>
           </table>
         </div>
-        <nav>
+        <nav className="mt-4">
           <ul className="pagination justify-content-center">
             <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-              <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
-                Previous
+              <button 
+                className="page-link fw-bold" 
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                ← Previous
               </button>
             </li>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <li key={page} className={`page-item ${page === currentPage ? 'active' : ''}`}>
-                <button className="page-link" onClick={() => setCurrentPage(page)}>
-                  {page}
-                </button>
-              </li>
-            ))}
+            <li className="page-item disabled">
+              <span className="page-link">
+                Page {currentPage} of {totalPages}
+              </span>
+            </li>
             <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-              <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
-                Next
+              <button 
+                className="page-link fw-bold" 
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next →
               </button>
             </li>
           </ul>
         </nav>
-        <div className="mt-2 text-muted">
-          Showing {startIndex + 1}-{Math.min(endIndex, processedData.length)} of {processedData.length} entries
+        <div className="mt-3 text-muted text-center">
+          <small>
+            <strong>Showing {startIndex + 1}–{Math.min(endIndex, processedData.length)}</strong> of <strong>{processedData.length}</strong> entries
+          </small>
         </div>
       </div>
     </div>
