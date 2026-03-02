@@ -9,7 +9,7 @@ export function DataProvider({ children }) {
   const [fileName, setFileName] = useState('');
 
   // Theme engine — persisted to localStorage
-  const [theme, setThemeState] = useState(() => localStorage.getItem('ix_theme') || 'dark');
+  const [theme, setThemeState] = useState(() => localStorage.getItem('ix_theme') || 'light');
   const [primaryColor, setPrimaryColorState] = useState(() => localStorage.getItem('ix_primary') || '#7c3aed');
 
   // Apply theme to document root

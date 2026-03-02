@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -11,7 +11,13 @@
     <!-- Apply theme SYNCHRONOUSLY before React mounts to prevent flash -->
     <script>
       (function() {
-        var theme = localStorage.getItem('ix_theme') || 'dark';
+        // Clear old dark theme default and force light as new default
+        var storedTheme = localStorage.getItem('ix_theme');
+        var theme = 'light';  // New default is light
+        if (storedTheme && storedTheme !== 'dark') {
+          theme = storedTheme;  // Respect user choice if not old default
+        }
+        localStorage.setItem('ix_theme', theme);
         var color = localStorage.getItem('ix_primary') || '#7c3aed';
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.style.setProperty('--primary-color', color);

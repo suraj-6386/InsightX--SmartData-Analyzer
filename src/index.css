@@ -5,37 +5,11 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ── 1. CSS Variables — Dark Theme (default) ─────────────────── */
+/* ── 1. CSS Variables — Light Theme (default) ─────────────────── */
 :root {
   --primary-color: #7c3aed;
   --primary-color-alpha: #7c3aed33;
 
-  --bg-primary: #0d0d1a;
-  --bg-secondary: #13132b;
-  --surface: #1a1a35;
-  --surface-hover: #22224a;
-
-  --text-primary: #e2e8f0;
-  --text-secondary: #a0aec0;
-  --text-muted: #718096;
-
-  --border-color: rgba(255, 255, 255, 0.09);
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.10);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-
-  --sidebar-width: 220px;
-  --topbar-height: 60px;
-
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ── 2. Light Theme ──────────────────────────────────────────── */
-[data-theme="light"] {
   --bg-primary: #eef2ff;
   --bg-secondary: #f0f4ff;
   --surface: #ffffff;
@@ -49,6 +23,32 @@
   --glass-bg: rgba(255, 255, 255, 0.75);
   --glass-border: rgba(255, 255, 255, 0.9);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+  --sidebar-width: 220px;
+  --topbar-height: 60px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── 2. Dark Theme ──────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg-primary: #0d0d1a;
+  --bg-secondary: #13132b;
+  --surface: #1a1a35;
+  --surface-hover: #22224a;
+
+  --text-primary: #e2e8f0;
+  --text-secondary: #a0aec0;
+  --text-muted: #718096;
+
+  --border-color: rgba(255, 255, 255, 0.09);
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 /* ── 3. Base Reset ───────────────────────────────────────────── */
