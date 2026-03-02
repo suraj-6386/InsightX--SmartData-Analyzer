@@ -4,7 +4,20 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>insightx_dse</title>
+    <title>InsightX Pro — Analytics Dashboard</title>
+    <meta name="description" content="InsightX Pro: PowerBI-inspired client-side data analytics. Upload CSV/Excel, visualize, clean, and export PDF reports."/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Apply theme SYNCHRONOUSLY before React mounts to prevent flash -->
+    <script>
+      (function() {
+        var theme = localStorage.getItem('ix_theme') || 'dark';
+        var color = localStorage.getItem('ix_primary') || '#7c3aed';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.setProperty('--primary-color', color);
+        document.documentElement.style.setProperty('--primary-color-alpha', color + '33');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
