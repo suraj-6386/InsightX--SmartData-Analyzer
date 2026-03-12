@@ -1,0 +1,66 @@
+InsightX Pro — User Manual
+
+QUICK START
+===========
+1. Run: npm install
+2. Run: npm run dev
+3. Open browser to http://localhost:5173
+4. Upload a CSV or Excel file to begin
+
+FILE UPLOAD
+===========
+Supported formats:
+- .csv (Comma-separated values)
+- .xlsx (Microsoft Excel)
+
+Maximum recommended file size: 10MB
+For larger files, consider sampling your data first
+
+DATA CLEANING OPERATIONS
+=========================
+1. Remove Null Values
+   - Removes all rows containing null, undefined, empty, or "null" values
+   
+2. Remove Duplicates
+   - Identifies and removes duplicate rows based on all columns
+   
+3. Convert Data Type
+   - Converts column to: Number, String, Date, or Boolean
+   
+4. Treat Null Values
+   - Methods: Mean, Median, Mode, Zero, Blank, or Remove Rows
+   
+5. Treat Outliers (IQR Method)
+   - Detects outliers using Interquartile Range
+   - Treatment options: Cap to Fence, Remove Rows, Replace with Mean, Replace with Median
+
+CHART TYPES
+===========
+- Bar Chart: Categorical comparisons
+- Line Chart: Trend analysis
+- Pie Chart: Distribution visualization
+- Scatter Plot: Correlation exploration
+- Box Plot: Distribution analysis
+- Forecast Chart: Time series prediction
+
+PDF REPORT
+===========
+Click "Generate Report" to create a PDF with:
+- Executive summary
+- Dataset overview
+- Column statistics
+- Tone & Style analysis (skewness/kurtosis)
+- Chart visualizations
+- Data preview table
+
+No additional configuration required.
+
+TROUBLESHOOTING
+===============
+- If upload fails: Ensure file format is CSV or XLSX
+- If charts don't render: Check browser console for errors
+- If PDF generation fails: Ensure pop-up blockers allow downloads
+
+SUPPORT
+=======
+Contact: See footer links in application

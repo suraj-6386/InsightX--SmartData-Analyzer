@@ -16,7 +16,7 @@ const DatasetDescribe = ({ data }) => {
 
   const columns = Object.keys(data[0]);
 
-  // Get numeric columns
+  
   const numericColumns = columns.filter(col => {
     const values = data.map(row => row[col]).filter(val => val !== null && val !== undefined && val !== '');
     const numericValues = values.filter(val => !isNaN(Number(val)));
@@ -36,7 +36,7 @@ const DatasetDescribe = ({ data }) => {
     );
   }
 
-  // Calculate statistics for each numeric column
+  
   const statistics = numericColumns.map(col => {
     const values = data.map(row => Number(row[col])).filter(val => !isNaN(val)).sort((a, b) => a - b);
     const count = values.length;
@@ -51,7 +51,7 @@ const DatasetDescribe = ({ data }) => {
     const min = Math.min(...values);
     const max = Math.max(...values);
 
-    // Calculate percentiles
+    
     const getPercentile = (arr, p) => {
       const index = (p / 100) * (arr.length - 1);
       const lower = Math.floor(index);

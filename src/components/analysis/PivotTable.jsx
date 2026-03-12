@@ -41,7 +41,7 @@ const PivotTable = ({ data: propData }) => {
 
   return (
     <ChartCard title="Pivot Table — Group By Analysis">
-      {/* Controls */}
+      {}
       <div className="pivot-controls">
         <div className="pivot-control-group">
           <label>Group By</label>
@@ -69,7 +69,7 @@ const PivotTable = ({ data: propData }) => {
         </button>
       </div>
 
-      {/* Mini bar chart */}
+      {}
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={displayData} margin={{ top: 5, right: 15, left: 0, bottom: 30 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
@@ -80,7 +80,7 @@ const PivotTable = ({ data: propData }) => {
         </BarChart>
       </ResponsiveContainer>
 
-      {/* Table */}
+      {}
       <div className="pivot-table-wrap">
         <table className="pivot-table">
           <thead>
@@ -120,3 +120,4 @@ const PivotTable = ({ data: propData }) => {
 };
 
 export default PivotTable;
+

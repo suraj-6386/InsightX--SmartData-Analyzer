@@ -32,7 +32,7 @@ const CategoryPieChart = () => {
   const numCol = numericColumns[0];
   if (!catCol) return null;
 
-  // Aggregate: count or sum per category
+  
   const grouped = {};
   currentData.forEach(row => {
     const key = String(row[catCol] ?? 'N/A').substring(0, 25);
@@ -48,7 +48,7 @@ const CategoryPieChart = () => {
   let pieData = Object.entries(grouped)
     .map(([name, value]) => ({ name, value: +value.toFixed(2) }))
     .sort((a, b) => b.value - a.value)
-    .slice(0, 8); // max 8 slices
+    .slice(0, 8); 
 
   const total = pieData.reduce((s, d) => s + d.value, 0);
 
@@ -108,3 +108,4 @@ const CategoryPieChart = () => {
 };
 
 export default CategoryPieChart;
+

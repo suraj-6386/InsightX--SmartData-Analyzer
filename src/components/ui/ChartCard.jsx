@@ -2,13 +2,7 @@ import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import html2canvas from 'html2canvas';
 
-/**
- * ChartCard — Glass-morphism wrapper for any chart widget.
- * Provides: Export PNG, Fullscreen, optional filter toggle.
- *
- * Props:
- *   title (string), children, onFullscreen (optional), noPadding (bool)
- */
+
 const ChartCard = ({ title, children, rightSlot, noPadding = false }) => {
   const cardRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -85,3 +79,4 @@ const ChartCard = ({ title, children, rightSlot, noPadding = false }) => {
 };
 
 export default ChartCard;
+

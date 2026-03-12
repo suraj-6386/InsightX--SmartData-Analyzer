@@ -1,13 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import { useData } from '../context/DataContext';
 import { useDataProcessor } from '../hooks/useDataProcessor';
 import { generatePDFReport } from '../services/pdfService';
+import ChartBuilder from '../components/charts/ChartBuilder';
+import { useStatistics } from '../hooks/useStatistics';
 
 const ReportsPage = () => {
-  const { currentData, charts, fileName } = useData();
-  const { rowCount, colCount, numericColumns, missingPercent, stats } = useDataProcessor(currentData);
+  const { currentData, charts, fileName, updateChart } = useData();
+  const { rowCount, colCount, numericColumns, missingPercent, stats: processorStats } = useDataProcessor(currentData);
+  const { stats: advancedStats } = useStatistics(currentData);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState('');
 
@@ -23,23 +26,42 @@ const ReportsPage = () => {
 
   const handleGeneratePDF = async () => {
     setIsGenerating(true);
-    setProgress('Preparing report...');
+    setProgress('Initializing engine...');
+    
     try {
-      await new Promise(r => setTimeout(r, 200));
-      setProgress('Generating PDF...');
-      await generatePDFReport(currentData, charts);
+      await new Promise(r => setTimeout(r, 500));
+      
+      const chartImages = [];
+      const chartElements = document.querySelectorAll('.hidden-chart-capture .chart-card-pro');
+      
+      if (chartElements.length > 0) {
+        for (let i = 0; i < chartElements.length; i++) {
+          setProgress(`Capturing visual ${i + 1} of ${chartElements.length}...`);
+          const canvas = await html2canvas(chartElements[i], {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+          });
+          chartImages.push(canvas.toDataURL('image/png'));
+        }
+      }
+
+      setProgress('Finalizing intelligence report...');
+      await generatePDFReport(currentData, chartImages, advancedStats);
+      
       setProgress('');
     } catch (err) {
       console.error(err);
-      alert('Error generating PDF: ' + err.message);
+      alert('PDF Engine Error: ' + err.message);
     } finally {
       setIsGenerating(false);
+      setProgress('');
     }
   };
 
-  // Summary table for display
   const statsRows = numericColumns.slice(0, 8).map(col => {
-    const s = stats[col] || {};
+    const s = processorStats[col] || {};
     return {
       col,
       mean: s.mean?.toFixed(2) ?? '-',
@@ -59,70 +81,69 @@ const ReportsPage = () => {
     >
       <div className="page-header">
         <h2 className="page-title">📄 Report Generation</h2>
-        <p className="page-subtitle">Export a professional PDF analytics report for your dataset</p>
+        <p className="page-subtitle">Export high-resolution intelligence reports with dynamic visuals</p>
       </div>
 
-      {/* Report Info Card */}
       <div className="reports-layout">
-        {/* Preview Panel */}
         <div className="glass-card report-preview">
           <div className="report-preview-header">
-            <div className="report-logo">IX</div>
+            <div className="report-logo" style={{ background: '#991b1b' }}>IX</div>
             <div>
-              <h3>InsightX Analytics Report</h3>
-              <p>Professional Data Report · {new Date().toLocaleDateString()}</p>
+              <h3>InsightX Intelligence Report</h3>
+              <p>Professional Analytics · {new Date().toLocaleDateString()}</p>
             </div>
           </div>
 
           <div className="report-info-grid">
             <div className="report-info-item">
-              <span className="ri-label">Dataset</span>
-              <span className="ri-value">{fileName || 'Uploaded data'}</span>
+              <span className="ri-label">Source File</span>
+              <span className="ri-value">{fileName || 'Active Stream'}</span>
             </div>
             <div className="report-info-item">
               <span className="ri-label">Total Rows</span>
               <span className="ri-value">{rowCount.toLocaleString()}</span>
             </div>
             <div className="report-info-item">
-              <span className="ri-label">Total Columns</span>
+              <span className="ri-label">Dimensions</span>
               <span className="ri-value">{colCount}</span>
             </div>
             <div className="report-info-item">
-              <span className="ri-label">Numeric Columns</span>
+              <span className="ri-label">Numeric Range</span>
               <span className="ri-value">{numericColumns.length}</span>
             </div>
             <div className="report-info-item">
-              <span className="ri-label">Missing Values</span>
-              <span className="ri-value" style={{ color: missingPercent > 10 ? '#e11d48' : 'var(--text-primary)' }}>
-                {missingPercent}%
+              <span className="ri-label">Data Integrity</span>
+              <span className="ri-value" style={{ color: missingPercent > 10 ? '#991b1b' : '#16a34a' }}>
+                {(100 - missingPercent).toFixed(1)}% Clean
               </span>
             </div>
             <div className="report-info-item">
-              <span className="ri-label">Custom Charts</span>
+              <span className="ri-label">Visual Assets</span>
               <span className="ri-value">{charts.length}</span>
             </div>
           </div>
 
           <div className="report-sections-list">
-            <h5>📋 Report Sections</h5>
+            <h5>📋 Included Intelligence Layers</h5>
             {[
-              '✅ Title Page',
-              '✅ Dataset Overview (rows, columns, types)',
-              '✅ Column-level Statistics (mean, median, std, min, max)',
-              '✅ Data Preview (first 20 rows)',
-              charts.length > 0 ? `✅ Chart Summary (${charts.length} charts)` : '⬜ Chart Summary (no charts added)',
+              '✅ Strategic Executive Summary',
+              '✅ Data Topology & Dimension Audit',
+              '✅ Statistical Distribution Profile',
+              '✅ Tone & Style (Skewness/Kurtosis) Analysis',
+              '✅ Interactive Visual Intelligence Capture',
+              '✅ Granular Data Preview',
             ].map(s => <p key={s} className="report-section-item">{s}</p>)}
           </div>
         </div>
 
-        {/* Action Panel */}
         <div className="report-actions-panel">
-          <div className="glass-card action-card">
-            <h5>🚀 Generate Report</h5>
-            <p>Download a complete PDF with dataset overview, statistics, and chart summaries.</p>
+          <div className="glass-card action-card" style={{ borderTop: '4px solid #991b1b' }}>
+            <h5>🚀 Export Professional PDF</h5>
+            <p>Compile all cleaning steps, statistical models, and visual charts into a high-fidelity document.</p>
 
             <motion.button
               className="btn btn-primary btn-lg generate-btn"
+              style={{ background: '#991b1b', border: 'none', boxShadow: '0 4px 15px rgba(153, 27, 27, 0.3)' }}
               onClick={handleGeneratePDF}
               disabled={isGenerating}
               whileHover={{ scale: isGenerating ? 1 : 1.02 }}
@@ -131,25 +152,23 @@ const ReportsPage = () => {
               {isGenerating ? (
                 <><span className="spinner" /> {progress}</>
               ) : (
-                '📄 Download PDF Report'
+                '📄 Generate Report'
               )}
             </motion.button>
 
-            <p className="action-hint">Report generated entirely in-browser. No data leaves your device.</p>
+            <p className="action-hint">High-resolution capture may take a few seconds based on chart complexity.</p>
           </div>
 
-          {/* Stats Summary Table */}
           {statsRows.length > 0 && (
             <div className="glass-card stats-preview-card">
-              <h5>📊 Statistics Preview</h5>
+              <h5>📊 Key Metric Preview</h5>
               <div className="stats-preview-table-wrap">
                 <table className="stats-preview-table">
                   <thead>
                     <tr>
-                      <th>Column</th>
+                      <th>Dimension</th>
                       <th>Mean</th>
-                      <th>Median</th>
-                      <th>Std</th>
+                      <th>Std Dev</th>
                       <th>Min</th>
                       <th>Max</th>
                     </tr>
@@ -159,7 +178,6 @@ const ReportsPage = () => {
                       <tr key={r.col}>
                         <td><strong>{r.col}</strong></td>
                         <td>{r.mean}</td>
-                        <td>{r.median}</td>
                         <td>{r.std}</td>
                         <td>{r.min}</td>
                         <td>{r.max}</td>
@@ -171,6 +189,19 @@ const ReportsPage = () => {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="hidden-chart-capture" style={{ position: 'fixed', left: '-9999px', top: 0, width: '1200px' }}>
+        {charts.map(chart => (
+          <div key={chart.id} style={{ width: '800px', height: '400px', marginBottom: '20px' }}>
+             <ChartBuilder
+                chart={chart}
+                data={currentData}
+                onUpdate={(u) => updateChart(chart.id, u)}
+                readOnly={true}
+              />
+          </div>
+        ))}
       </div>
     </motion.div>
   );

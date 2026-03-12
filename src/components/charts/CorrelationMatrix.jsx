@@ -3,10 +3,7 @@ import { useCorrelation } from '../../hooks/useCorrelation';
 import ChartCard from '../ui/ChartCard';
 import { correlationLabel, correlationDirection } from '../../utils/regressionUtils';
 
-/**
- * CorrelationMatrix — renders a color-coded Pearson R heatmap grid.
- * Green = strong positive, Red = strong negative, Gray = negligible.
- */
+
 const CorrelationMatrix = ({ data }) => {
   const { columns, matrix } = useCorrelation(data);
   const [selected, setSelected] = useState(null);
@@ -22,8 +19,8 @@ const CorrelationMatrix = ({ data }) => {
   const getColor = (r) => {
     if (r === 1) return 'var(--primary-color)';
     const abs = Math.abs(r);
-    if (r > 0) return `rgba(5, 150, 105, ${0.15 + abs * 0.75})`;   // green
-    return `rgba(225, 29, 72, ${0.15 + abs * 0.75})`;               // red
+    if (r > 0) return `rgba(5, 150, 105, ${0.15 + abs * 0.75})`;   
+    return `rgba(225, 29, 72, ${0.15 + abs * 0.75})`;               
   };
 
   const getTextColor = (r) => Math.abs(r) > 0.5 ? '#fff' : 'var(--text-primary)';
@@ -66,14 +63,14 @@ const CorrelationMatrix = ({ data }) => {
           </table>
         </div>
 
-        {/* Color scale legend */}
+        {}
         <div className="corr-legend">
           <span className="corr-legend-neg">-1.0</span>
           <div className="corr-legend-bar" />
           <span className="corr-legend-pos">+1.0</span>
         </div>
 
-        {/* Detail tooltip on click */}
+        {}
         {selected && (
           <div className="corr-detail glass-card">
             <button className="corr-detail-close" onClick={() => setSelected(null)}>✕</button>
@@ -98,3 +95,4 @@ const CorrelationMatrix = ({ data }) => {
 };
 
 export default CorrelationMatrix;
+

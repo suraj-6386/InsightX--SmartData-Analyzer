@@ -12,7 +12,7 @@ import DatasetDescribe from '../components/DatasetDescribe';
 import { useDropzone } from 'react-dropzone';
 import * as XLSX from 'xlsx';
 
-// ─── Upload screen shown when no data ────────────────────────────────────────
+
 const UploadScreen = () => {
   const { loadData } = useData();
 
@@ -76,11 +76,11 @@ const UploadScreen = () => {
   );
 };
 
-// ─── Main Dashboard ───────────────────────────────────────────────────────────
+
 const Dashboard = () => {
   const { currentData, cleanedData, setCleanedData, charts, addChart, updateChart, deleteChart } = useData();
   const [selectedChart, setSelectedChart] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'builder' | 'table'
+  const [activeTab, setActiveTab] = useState('overview'); 
 
   const handleDataClean = (newData, cleaningResults, actionType) => {
     setCleanedData(newData);
@@ -89,6 +89,7 @@ const Dashboard = () => {
       removeDuplicates: `${cleaningResults.duplicatesRemoved} duplicate rows removed`,
       convertDataType: `Column "${cleaningResults.column}" converted to ${cleaningResults.targetType}`,
       treatNulls: `${cleaningResults.rowsAffected} rows treated with ${cleaningResults.treatment}`,
+      treatOutliers: `${cleaningResults.treatedCount} outliers in "${cleaningResults.column}" treated with ${cleaningResults.method}`,
     };
     if (msgs[actionType]) alert(msgs[actionType]);
   };
@@ -126,7 +127,7 @@ const Dashboard = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Tab Navigation */}
+      {}
       <div className="page-tabs">
         {TABS.map(tab => (
           <button
@@ -161,7 +162,16 @@ const Dashboard = () => {
                 <h5 className="section-title">Interactive Charts ({charts.length})</h5>
                 <div className="d-flex gap-2">
                   <div className="dropdown">
-                    <button className="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" disabled={!currentData}>
+                    <button 
+                      className="btn btn-sm btn-download dropdown-toggle" 
+                      data-bs-toggle="dropdown" 
+                      disabled={!currentData}
+                      style={{ 
+                        background: '#8B0000', 
+                        borderColor: '#8B0000', 
+                        color: '#fff'
+                      }}
+                    >
                       📥 Download Data
                     </button>
                     <ul className="dropdown-menu dropdown-menu-end">

@@ -57,7 +57,7 @@ const DataTable = ({ data }) => {
   };
 
   const handleFilter = () => {
-    // Filter is applied in useMemo
+    
   };
 
   if (!data || data.length === 0) return null;

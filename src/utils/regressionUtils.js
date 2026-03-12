@@ -1,20 +1,12 @@
-/**
- * regressionUtils.js
- * Pearson Correlation, Linear Regression (Least Squares), R² coefficient.
- * Pure math — no dependencies.
- */
+
 
 import { mean } from './statisticsUtils';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PEARSON CORRELATION
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Pearson Correlation Coefficient between two arrays.
- * r = Σ(xi - x̄)(yi - ȳ) / sqrt(Σ(xi-x̄)² · Σ(yi-ȳ)²)
- * Returns a value in [-1, 1].
- */
+
+
+
+
 export const pearsonCorrelation = (xArr, yArr) => {
     const n = Math.min(xArr.length, yArr.length);
     if (n < 2) return 0;
@@ -37,10 +29,7 @@ export const pearsonCorrelation = (xArr, yArr) => {
     return denom === 0 ? 0 : +(num / denom).toFixed(4);
 };
 
-/**
- * Build a full correlation matrix for all numeric columns.
- * Returns { columns, matrix } where matrix[i][j] = r(col_i, col_j)
- */
+
 export const buildCorrelationMatrix = (data, numericColumns) => {
     const vectors = {};
     numericColumns.forEach(col => {
@@ -57,17 +46,11 @@ export const buildCorrelationMatrix = (data, numericColumns) => {
     return { columns: numericColumns, matrix };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LINEAR REGRESSION — Ordinary Least Squares
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Simple linear regression: y = slope·x + intercept
- * Uses OLS (Ordinary Least Squares).
- * 
- * m = (n·Σxy - Σx·Σy) / (n·Σx² - (Σx)²)
- * b = (Σy - m·Σx) / n
- */
+
+
+
+
 export const linearRegression = (xArr, yArr) => {
     const n = Math.min(xArr.length, yArr.length);
     if (n < 2) return { slope: 0, intercept: 0, r2: 0, predict: () => 0 };
@@ -83,7 +66,7 @@ export const linearRegression = (xArr, yArr) => {
     const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX) || 0;
     const intercept = (sumY - slope * sumX) / n;
 
-    // R² coefficient of determination
+    
     const yMean = mean(y);
     const ssTot = y.reduce((s, v) => s + Math.pow(v - yMean, 2), 0);
     const ssRes = y.reduce((s, v, i) => s + Math.pow(v - (slope * x[i] + intercept), 2), 0);
@@ -94,10 +77,7 @@ export const linearRegression = (xArr, yArr) => {
     return { slope: +slope.toFixed(6), intercept: +intercept.toFixed(6), r2, predict };
 };
 
-/**
- * Generate trendline points for scatter chart overlay.
- * Returns array of { x, trendY } for the regression line.
- */
+
 export const getTrendlinePoints = (xArr, yArr) => {
     const { predict } = linearRegression(xArr, yArr);
     const xMin = Math.min(...xArr);
@@ -108,9 +88,7 @@ export const getTrendlinePoints = (xArr, yArr) => {
     ];
 };
 
-/**
- * Get correlation strength label.
- */
+
 export const correlationLabel = (r) => {
     const abs = Math.abs(r);
     if (abs >= 0.9) return 'Very Strong';
@@ -122,3 +100,4 @@ export const correlationLabel = (r) => {
 
 export const correlationDirection = (r) =>
     r > 0.05 ? 'Positive' : r < -0.05 ? 'Negative' : 'None';
+

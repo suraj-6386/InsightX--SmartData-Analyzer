@@ -8,20 +8,20 @@ export function DataProvider({ children }) {
   const [charts, setCharts] = useState([]);
   const [fileName, setFileName] = useState('');
 
-  // Theme engine — persisted to localStorage
+  
   const [theme, setThemeState] = useState(() => localStorage.getItem('ix_theme') || 'light');
-  const [primaryColor, setPrimaryColorState] = useState(() => localStorage.getItem('ix_primary') || '#7c3aed');
+  const [primaryColor, setPrimaryColorState] = useState(() => localStorage.getItem('ix_primary') || '#8B0000');
 
-  // Apply theme to document root
+  
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('ix_theme', theme);
   }, [theme]);
 
-  // Apply primary color CSS variable
+  
   useEffect(() => {
     document.documentElement.style.setProperty('--primary-color', primaryColor);
-    // Compute a lighter version for hover states
+    
     document.documentElement.style.setProperty('--primary-color-alpha', primaryColor + '33');
     localStorage.setItem('ix_primary', primaryColor);
   }, [primaryColor]);
@@ -29,7 +29,7 @@ export function DataProvider({ children }) {
   const setTheme = (t) => setThemeState(t);
   const setPrimaryColor = (c) => setPrimaryColorState(c);
 
-  // Upload a file's parsed data into global state
+  
   const loadData = (parsed, name = '') => {
     setRawData(parsed);
     setCleanedData(parsed);
@@ -37,7 +37,7 @@ export function DataProvider({ children }) {
     setCharts([]);
   };
 
-  // Charts management
+  
   const addChart = (chartConfig) => {
     setCharts(prev => [...prev, { id: Date.now(), ...chartConfig }]);
   };
@@ -69,3 +69,4 @@ export function useData() {
   if (!ctx) throw new Error('useData must be used within DataProvider');
   return ctx;
 }
+

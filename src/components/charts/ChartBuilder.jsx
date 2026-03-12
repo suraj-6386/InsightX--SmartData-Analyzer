@@ -54,7 +54,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
       const insights = [];
 
       if (chart.type === 'bar' || chart.type === 'line') {
-        // Analyze trends for bar/line charts
+        
         const aggregated = aggregateData(data, chart.xAxis, chart.yAxis, chart.aggregation);
         if (aggregated.length > 1) {
           const first = aggregated[0].value;
@@ -66,12 +66,12 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
             insights.push(`${chart.yAxis} ${direction} by ${Math.abs(change).toFixed(1)}% from ${aggregated[0].name} to ${aggregated[aggregated.length - 1].name}`);
           }
 
-          // Find max value
+          
           const maxItem = aggregated.reduce((max, item) => item.value > max.value ? item : max);
           insights.push(`${maxItem.name} shows the highest ${chart.yAxis} at ${maxItem.value.toFixed(2)}`);
         }
       } else if (chart.type === 'pie' || chart.type === 'donut') {
-        // Analyze pie/donut charts
+        
         const aggregated = aggregateData(data, chart.xAxis, chart.yAxis, chart.aggregation);
         const total = aggregated.reduce((sum, item) => sum + item.value, 0);
         const topItem = aggregated.reduce((max, item) => item.value > max.value ? item : max);
@@ -80,12 +80,12 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
           insights.push(`${topItem.name} dominates with ${(topItem.value / total * 100).toFixed(1)}% of total ${chart.yAxis}`);
         }
       } else if (chart.type === 'scatter') {
-        // Analyze scatter plots
+        
         const xValues = data.map(row => Number(row[chart.xAxis])).filter(v => !isNaN(v));
         const yValues = data.map(row => Number(row[chart.yAxis])).filter(v => !isNaN(v));
 
         if (xValues.length > 0 && yValues.length > 0) {
-          // Calculate correlation coefficient
+          
           const n = Math.min(xValues.length, yValues.length);
           const sumX = xValues.slice(0, n).reduce((a, b) => a + b, 0);
           const sumY = yValues.slice(0, n).reduce((a, b) => a + b, 0);
@@ -281,7 +281,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
       }
 
       case 'stackedBar': {
-        // Group data by legend field
+        
         const groupedData = {};
         data.forEach(row => {
           const legendVal = row[chart.legend] || 'Default';
@@ -305,7 +305,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
           data: xCategories.map(xCat => {
             const values = groupedData[legendKey][xCat] || [];
             const aggregatedValue = values.length > 0 ?
-              values.reduce((a, b) => a + b, 0) / values.length : 0; // Simple average for demo
+              values.reduce((a, b) => a + b, 0) / values.length : 0; 
             return aggregatedValue;
           }),
           label: chart.showLabels ? { show: true, position: 'inside' } : false
@@ -320,7 +320,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
       }
 
       case 'multiLine': {
-        // Group data by legend field
+        
         const groupedData = {};
         data.forEach(row => {
           const legendVal = row[chart.legend] || 'Default';
@@ -351,7 +351,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
       }
 
       case 'radar': {
-        // Simplified radar - using aggregated data as indicators
+        
         const aggregatedData = aggregateData(data, chart.xAxis, chart.yAxis, chart.aggregation);
         const indicators = aggregatedData.map(item => ({
           name: item.name,
@@ -372,7 +372,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
       }
 
       case 'heatmap': {
-        // Simplified heatmap
+        
         const xCategories = [...new Set(data.map(row => row[chart.xAxis]))];
         const yCategories = [...new Set(data.map(row => row[chart.yAxis]))];
 
@@ -484,7 +484,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
       }
 
       case 'boxplot': {
-        // Simplified boxplot - calculate quartiles for each category
+        
         const categories = [...new Set(data.map(row => row[chart.xAxis]))];
         const boxplotData = categories.map(category => {
           const values = data
@@ -514,7 +514,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
       }
 
       case 'combo': {
-        // Combo chart with bar and line
+        
         const barData = aggregateData(data, chart.xAxis, chart.yAxis, 'sum');
         const lineData = aggregateData(data, chart.xAxis, chart.yAxis, 'avg');
 
@@ -564,7 +564,7 @@ const ChartBuilder = ({ chart, data, onDelete, onSelect }) => {
     if (data && data.length > 0 && chartRef.current) {
       const chartInstance = echarts.init(chartRef.current);
       const option = generateChartOption(chart, data);
-      chartInstance.setOption(option, true); // Not merge to avoid issues
+      chartInstance.setOption(option, true); 
 
       const handleResize = () => chartInstance.resize();
       window.addEventListener('resize', handleResize);

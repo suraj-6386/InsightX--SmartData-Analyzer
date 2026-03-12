@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../context/DataContext';
 import useDataCleaning from '../hooks/useDataCleaning';
 import { getNumericColumns } from '../utils/statisticsUtils';
+import * as XLSX from 'xlsx';
 
-// ─── Outlier Method Descriptions ──────────────────────────────────────────────
 const OUTLIER_METHODS = [
   {
     id: 'remove',
@@ -29,7 +29,6 @@ const OUTLIER_METHODS = [
   },
 ];
 
-// ─── Null Treatment Methods ───────────────────────────────────────────────────
 const NULL_METHODS = [
   { id: 'mean',   label: 'Fill with Mean',   desc: 'Replace missing values with the column average (numeric cols only)' },
   { id: 'median', label: 'Fill with Median', desc: 'Replace with the middle value of the column' },
@@ -39,7 +38,6 @@ const NULL_METHODS = [
   { id: 'remove', label: 'Remove Rows',       desc: 'Delete rows containing any null value', danger: true },
 ];
 
-// ─── Action Card ──────────────────────────────────────────────────────────────
 const ActionCard = ({ icon, label, desc, onClick, color = 'primary', done = false, badge = null }) => (
   <motion.button
     className={`clean-action-card clean-action-${color} ${done ? 'done' : ''}`}
@@ -61,7 +59,6 @@ const ActionCard = ({ icon, label, desc, onClick, color = 'primary', done = fals
   </motion.button>
 );
 
-// ─── Inline Modal ─────────────────────────────────────────────────────────────
 const Modal = ({ title, children, onClose }) => (
   <div className="ix-modal-overlay" onClick={onClose}>
     <motion.div
@@ -80,7 +77,6 @@ const Modal = ({ title, children, onClose }) => (
   </div>
 );
 
-// ─── Main DataCleaning Page ───────────────────────────────────────────────────
 const DataCleaningPage = () => {
   const { currentData, rawData, setCleanedData } = useData();
 
@@ -93,6 +89,7 @@ const DataCleaningPage = () => {
   const [showConvertModal, setShowConvertModal] = useState(false);
   const [convertConfig, setConvertConfig] = useState({ column: '', targetType: '' });
   const [selectedOutlierCol, setSelectedOutlierCol] = useState('all');
+  const [showExportOptions, setShowExportOptions] = useState(false);
 
   const showNotif = (msg, type = 'success') => {
     setNotification({ msg, type });
@@ -125,6 +122,34 @@ const DataCleaningPage = () => {
     handleConvertDataType,
     handleTreatOutliers,
   } = useDataCleaning(currentData, handleDataClean);
+
+  const downloadCleanData = (format) => {
+    if (!currentData || currentData.length === 0) { showNotif('⚠️ No data available', 'warning'); return; }
+    
+    try {
+      if (format === 'csv') {
+        const headers = Object.keys(currentData[0]);
+        const csv = [
+          headers.join(','), 
+          ...currentData.map(row => headers.map(h => `"${(row[h] ?? '').toString().replace(/"/g, '""')}"`).join(','))
+        ].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'cleaned_data.csv';
+        a.click();
+      } else {
+        const ws = XLSX.utils.json_to_sheet(currentData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Cleaned Data');
+        XLSX.writeFile(wb, 'cleaned_data.xlsx');
+      }
+      showNotif(`✅ Data exported as ${format.toUpperCase()}`);
+    } catch (err) {
+      showNotif('❌ Export failed', 'danger');
+    }
+    setShowExportOptions(false);
+  };
 
   if (!currentData) {
     return (
@@ -165,7 +190,6 @@ const DataCleaningPage = () => {
 
   return (
     <motion.div className="cleaning-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      {/* Toast notification */}
       <AnimatePresence>
         {notification && (
           <motion.div
@@ -179,20 +203,58 @@ const DataCleaningPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Page header */}
       <div className="page-header">
-        <h2 className="page-title">🧹 Data Cleaning Studio</h2>
-        <div className="cleaning-meta-row">
-          <span className="clean-meta-pill">{currentData.length.toLocaleString()} rows</span>
-          <span className="clean-meta-pill">{columns.length} columns</span>
-          {nullCount > 0 && <span className="clean-meta-pill warn">⚠️ {nullCount} rows with nulls</span>}
-          {dupCount > 0 && <span className="clean-meta-pill warn">⚠️ {dupCount} duplicates</span>}
-          {outlierInfo.total > 0 && <span className="clean-meta-pill danger">🔴 {outlierInfo.total} outliers</span>}
-          {outlierInfo.total === 0 && currentData.length > 0 && <span className="clean-meta-pill ok">✅ 0 outliers</span>}
+        <div className="d-flex justify-content-between align-items-center w-100">
+          <div>
+            <h2 className="page-title">🧹 Data Cleaning Studio</h2>
+            <div className="cleaning-meta-row">
+              <span className="clean-meta-pill">{currentData.length.toLocaleString()} rows</span>
+              <span className="clean-meta-pill">{columns.length} columns</span>
+              {nullCount > 0 && <span className="clean-meta-pill warn">⚠️ {nullCount} rows with nulls</span>}
+              {dupCount > 0 && <span className="clean-meta-pill warn">⚠️ {dupCount} duplicates</span>}
+              {outlierInfo.total > 0 && <span className="clean-meta-pill danger">🔴 {outlierInfo.total} outliers</span>}
+              {outlierInfo.total === 0 && currentData.length > 0 && <span className="clean-meta-pill ok">✅ 0 outliers</span>}
+            </div>
+          </div>
+          
+          <div className="export-container">
+            <div className="split-button" style={{ position: 'relative' }}>
+              <button 
+                className="btn-export-main"
+                onClick={() => downloadCleanData('csv')}
+              >
+                <span className="btn-icon">☁️</span>
+                Download Cleaned Data
+              </button>
+              <button 
+                className="btn-export-toggle"
+                onClick={() => setShowExportOptions(!showExportOptions)}
+              >
+                ▼
+              </button>
+              
+              <AnimatePresence>
+                {showExportOptions && (
+                  <motion.div 
+                    className="export-dropdown glass-card shadow-lg"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                  >
+                    <button className="dropdown-item" onClick={() => downloadCleanData('csv')}>
+                      <span className="item-icon">📄</span> CSV Format
+                    </button>
+                    <button className="dropdown-item" onClick={() => downloadCleanData('xlsx')}>
+                      <span className="item-icon">📊</span> Excel Format
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ── Cleaning Actions Grid ── */}
       <div className="glass-card cleaning-section">
         <div className="cleaning-section-header">
           <h5 className="section-heading">⚙️ Cleaning Operations</h5>
@@ -241,7 +303,6 @@ const DataCleaningPage = () => {
         </div>
       </div>
 
-      {/* ── Drop Columns ── */}
       <div className="glass-card cleaning-section">
         <h5 className="section-heading">🗂️ Drop Columns</h5>
         <p className="section-desc">Select columns to permanently remove from the dataset.</p>
@@ -267,7 +328,6 @@ const DataCleaningPage = () => {
         )}
       </div>
 
-      {/* ── Missing Heatmap ── */}
       <div className="glass-card cleaning-section">
         <div className="section-heading-row">
           <h5 className="section-heading">🔍 Missing Value Heatmap</h5>
@@ -309,7 +369,6 @@ const DataCleaningPage = () => {
         </AnimatePresence>
       </div>
 
-      {/* ── Outlier Per-Column Summary ── */}
       {outlierInfo.total > 0 && (
         <div className="glass-card cleaning-section">
           <h5 className="section-heading">📊 Outlier Summary by Column</h5>
@@ -325,7 +384,6 @@ const DataCleaningPage = () => {
         </div>
       )}
 
-      {/* ══ OUTLIER MODAL ══ */}
       <AnimatePresence>
         {showOutlierModal && (
           <Modal title="📊 Treat Outliers — IQR Method" onClose={() => setShowOutlierModal(false)}>
@@ -373,7 +431,6 @@ const DataCleaningPage = () => {
         )}
       </AnimatePresence>
 
-      {/* ══ TREAT NULLS MODAL ══ */}
       <AnimatePresence>
         {showNullModal && (
           <Modal title="🧩 Treat Null Values" onClose={() => setShowNullModal(false)}>
@@ -402,7 +459,6 @@ const DataCleaningPage = () => {
         )}
       </AnimatePresence>
 
-      {/* ══ CONVERT DATA TYPE MODAL ══ */}
       <AnimatePresence>
         {showConvertModal && (
           <Modal title="🔁 Convert Data Type" onClose={() => setShowConvertModal(false)}>
@@ -443,3 +499,4 @@ const DataCleaningPage = () => {
 };
 
 export default DataCleaningPage;
+

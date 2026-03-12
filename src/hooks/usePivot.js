@@ -1,6 +1,4 @@
-/**
- * usePivot.js — dynamic pivot table and filter hook.
- */
+
 import { useMemo, useState, useCallback } from 'react';
 import { buildPivotTable, applyFilter, addCalculatedColumn } from '../utils/pivotUtils';
 
@@ -10,15 +8,15 @@ export const usePivot = (data) => {
     });
     const [filterConditions, setFilterConditions] = useState([]);
     const [filterLogic, setFilterLogic] = useState('AND');
-    const [calculatedCols, setCalculatedCols] = useState([]); // [{name, formula}]
+    const [calculatedCols, setCalculatedCols] = useState([]); 
 
-    // Apply filters to raw data
+    
     const filteredData = useMemo(() => {
         if (!data) return [];
         return applyFilter(data, filterConditions, filterLogic);
     }, [data, filterConditions, filterLogic]);
 
-    // Apply calculated columns to filtered data
+    
     const enrichedData = useMemo(() => {
         let result = filteredData;
         calculatedCols.forEach(({ name, formula }) => {
@@ -27,7 +25,7 @@ export const usePivot = (data) => {
         return result;
     }, [filteredData, calculatedCols]);
 
-    // Build pivot table
+    
     const pivotResult = useMemo(() => {
         const { rowDim, colDim, valueCol, aggFunc } = pivotConfig;
         if (!rowDim || !valueCol || enrichedData.length === 0) return null;
@@ -62,3 +60,4 @@ export const usePivot = (data) => {
         originalCount: data?.length ?? 0,
     };
 };
+

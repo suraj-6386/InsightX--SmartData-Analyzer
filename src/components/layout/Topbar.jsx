@@ -4,6 +4,7 @@ import { useData } from '../../context/DataContext';
 import { parseFile } from '../../services/parserService';
 
 const COLOR_PRESETS = [
+  { label: 'Dark Red', value: '#8B0000' },
   { label: 'Violet', value: '#7c3aed' },
   { label: 'Blue', value: '#2563eb' },
   { label: 'Emerald', value: '#059669' },
@@ -31,18 +32,13 @@ const Topbar = ({ activePage, setActivePage }) => {
 
   return (
     <header className="topbar">
-      {/* Brand */}
       <div className="topbar-brand">
         <div className="brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M3 3v18h18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
-            <path d="M7 16l4-4 4 4 4-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
+  <img src="/icon.png" alt="InsightX Logo" />
+</div>
         <span className="brand-name">InsightX <span className="brand-pro">Pro</span></span>
       </div>
 
-      {/* File name chip */}
       {fileName && (
         <motion.div
           className="file-chip"
@@ -55,7 +51,6 @@ const Topbar = ({ activePage, setActivePage }) => {
       )}
 
       <div className="topbar-actions">
-        {/* Upload Button */}
         <motion.button
           className="topbar-btn upload-btn"
           onClick={() => fileInputRef.current?.click()}
@@ -75,7 +70,6 @@ const Topbar = ({ activePage, setActivePage }) => {
           onChange={handleFileChange}
         />
 
-        {/* Color Presets */}
         <div className="color-picker">
           {COLOR_PRESETS.map(c => (
             <button
@@ -88,7 +82,6 @@ const Topbar = ({ activePage, setActivePage }) => {
           ))}
         </div>
 
-        {/* Dark / Light Toggle */}
         <motion.button
           className="theme-toggle"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -104,3 +97,4 @@ const Topbar = ({ activePage, setActivePage }) => {
 };
 
 export default Topbar;
+

@@ -24,7 +24,7 @@ export const calculateKPIs = (data) => {
     return { column: col, min: Math.min(...values) };
   });
 
-  // Simple top category for first non-numeric column
+  
   const nonNumericColumns = columns.filter(col => !numericColumns.includes(col));
   let topCategory = null;
   if (nonNumericColumns.length > 0) {
@@ -60,11 +60,11 @@ export const detectColumnTypes = (data) => {
   columns.forEach(col => {
     const sampleValues = data.slice(0, 10).map(row => row[col]);
 
-    // Check if numeric
+    
     if (sampleValues.every(val => !isNaN(Number(val)) && val !== '')) {
       numeric.push(col);
     }
-    // Check if date
+    
     else if (sampleValues.some(val => {
       const date = new Date(val);
       return !isNaN(date.getTime()) && val.toString().match(/\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}/);

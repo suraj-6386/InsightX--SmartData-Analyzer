@@ -1,13 +1,8 @@
-/**
- * useDataCleaning.js
- * Comprehensive data cleaning hook for InsightX Pro.
- * Handles: null removal, deduplication, null treatment, type conversion,
- * and IQR-based outlier removal/capping (Winsorization).
- */
+
 import { useMemo, useCallback } from 'react';
 import { getNumericColumns } from '../utils/statisticsUtils';
 
-// ─── IQR Math Helpers ─────────────────────────────────────────────────────────
+
 const getPercentile = (sorted, p) => {
     const idx = (p / 100) * (sorted.length - 1);
     const lo = Math.floor(idx), hi = Math.ceil(idx);
@@ -29,7 +24,7 @@ const computeIQRBounds = (values) => {
     };
 };
 
-// ─── Per-column outlier stats (for badge display) ────────────────────────────
+
 export const countOutliers = (data) => {
     if (!data || data.length === 0) return { total: 0, byColumn: {} };
     const numericColumns = getNumericColumns(data);
@@ -50,12 +45,12 @@ export const countOutliers = (data) => {
 
 const useDataCleaning = (data, onDataClean) => {
 
-    // Memoized outlier counts for live badge
+    
     const outlierInfo = useMemo(() => countOutliers(data), [data]);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // REMOVE NULLS (rows with any null/empty/undefined cell)
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     const handleRemoveNulls = useCallback(() => {
         const before = data.length;
         const cleaned = data.filter(row =>
@@ -64,9 +59,9 @@ const useDataCleaning = (data, onDataClean) => {
         onDataClean(cleaned, { nullsRemoved: before - cleaned.length }, 'removeNulls');
     }, [data, onDataClean]);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // REMOVE DUPLICATES
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     const handleRemoveDuplicates = useCallback(() => {
         const seen = new Set();
         const cleaned = data.filter(row => {
@@ -76,15 +71,15 @@ const useDataCleaning = (data, onDataClean) => {
         onDataClean(cleaned, { duplicatesRemoved: data.length - cleaned.length }, 'removeDuplicates');
     }, [data, onDataClean]);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // TREAT NULL VALUES (fill with mean/median/mode/zero/blank or remove rows)
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     const handleTreatNulls = useCallback((treatment) => {
         if (!treatment) return;
         const cols = Object.keys(data[0] || {});
         let rowsAffected = 0;
 
-        // Pre-compute column statistics for fill methods
+        
         const colStats = {};
         if (['mean', 'median', 'mode'].includes(treatment)) {
             cols.forEach(col => {
@@ -135,9 +130,9 @@ const useDataCleaning = (data, onDataClean) => {
         onDataClean(result, { treatment, rowsAffected }, 'treatNulls');
     }, [data, onDataClean]);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // CONVERT DATA TYPE
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     const handleConvertDataType = useCallback((column, targetType) => {
         if (!column || !targetType) return;
         const cleaned = data.map(row => {
@@ -156,17 +151,17 @@ const useDataCleaning = (data, onDataClean) => {
         onDataClean(cleaned, { column, targetType }, 'convertDataType');
     }, [data, onDataClean]);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // TREAT OUTLIERS — IQR Method
-    //   method = 'remove' : filter out rows where any numeric col is an outlier
-    //   method = 'cap'    : Winsorize — cap values at fences (preserves row count)
-    //   method = 'p5p95'  : Replace with P5/P95 percentile values
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
+    
+    
+    
     const handleTreatOutliers = useCallback((method, targetCol = null) => {
         const numericColumns = targetCol ? [targetCol] : getNumericColumns(data);
         if (numericColumns.length === 0) return;
 
-        // Pre-compute IQR bounds per column
+        
         const bounds = {};
         numericColumns.forEach(col => {
             const vals = data.map(r => Number(r[col])).filter(v => !isNaN(v));
@@ -177,7 +172,7 @@ const useDataCleaning = (data, onDataClean) => {
         let outliersHandled = 0;
 
         if (method === 'remove') {
-            // Remove entire row if ANY numeric column contains an outlier
+            
             result = data.filter(row => {
                 const isOutlier = numericColumns.some(col => {
                     const b = bounds[col];
@@ -189,7 +184,7 @@ const useDataCleaning = (data, onDataClean) => {
                 return !isOutlier;
             });
         } else if (method === 'cap') {
-            // Winsorization: cap at lower/upper fence
+            
             result = data.map(row => {
                 const newRow = { ...row };
                 numericColumns.forEach(col => {
@@ -203,7 +198,7 @@ const useDataCleaning = (data, onDataClean) => {
                 return newRow;
             });
         } else if (method === 'p5p95') {
-            // Replace with P5 / P95 percentiles
+            
             result = data.map(row => {
                 const newRow = { ...row };
                 numericColumns.forEach(col => {
@@ -237,3 +232,4 @@ const useDataCleaning = (data, onDataClean) => {
 };
 
 export default useDataCleaning;
+

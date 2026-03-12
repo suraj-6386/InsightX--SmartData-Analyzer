@@ -31,7 +31,7 @@ const FormulaFields = ({ data: propData }) => {
         setPreview(null);
         return;
       }
-      // Preview first 3 rows
+      
       const rows = data.slice(0, 3).map(row => ({
         ...Object.fromEntries(columns.slice(0, 3).map(c => [c, row[c]])),
         [newColName || 'Result']: evaluateFormula(row, formula, columns),
@@ -78,7 +78,7 @@ const FormulaFields = ({ data: propData }) => {
         <span className="formula-hint">Available: {columns.join(', ')}</span>
       </p>
 
-      {/* Example formulas */}
+      {}
       <div className="formula-examples">
         {FORMULA_EXAMPLES.map(ex => (
           <button
@@ -124,7 +124,7 @@ const FormulaFields = ({ data: propData }) => {
         </button>
       </div>
 
-      {/* Preview table */}
+      {}
       {preview && (
         <div className="formula-preview">
           <p className="formula-preview-label">✅ Preview (first 3 rows):</p>
@@ -147,7 +147,7 @@ const FormulaFields = ({ data: propData }) => {
         </div>
       )}
 
-      {/* Added columns list */}
+      {}
       {addedCols.length > 0 && (
         <div className="formula-cols-list">
           <p className="formula-preview-label">Created Columns:</p>
@@ -165,3 +165,4 @@ const FormulaFields = ({ data: propData }) => {
 };
 
 export default FormulaFields;
+

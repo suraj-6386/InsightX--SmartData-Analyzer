@@ -55,3 +55,4 @@ const SummaryStatsChart = () => {
 };
 
 export default SummaryStatsChart;
+

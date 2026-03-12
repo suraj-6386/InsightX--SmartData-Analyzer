@@ -9,10 +9,7 @@ import { getNumericColumns, extractNumericValues } from '../../utils/statisticsU
 import { quartiles } from '../../utils/statisticsUtils';
 import ChartCard from '../ui/ChartCard';
 
-/**
- * BoxPlotChart — visual distribution summary (Q1, Median, Q3, fences, outliers).
- * Uses Recharts ComposedChart with reference lines to represent the box.
- */
+
 const BoxPlotChart = ({ data: propData }) => {
   const { currentData } = useData();
   const data = propData || currentData;
@@ -30,7 +27,7 @@ const BoxPlotChart = ({ data: propData }) => {
   const { lowerFence = 0, upperFence = 0, outliers: outlierVals = [] } = outInfo;
   const sorted = [...values].sort((a, b) => a - b);
 
-  // Build distribution histogram bins (20 bins)
+  
   const min = sorted[0], max = sorted[sorted.length - 1];
   const binCount = 20;
   const binWidth = (max - min) / binCount || 1;
@@ -90,11 +87,11 @@ const BoxPlotChart = ({ data: propData }) => {
             fillOpacity={0.7}
             radius={[3, 3, 0, 0]}
           />
-          {/* IQR box boundaries */}
+          {}
           <ReferenceLine x={q1} stroke="#2563eb" strokeDasharray="6 3" label={{ value: 'Q1', fill: '#2563eb', fontSize: 10 }} />
           <ReferenceLine x={q2} stroke="#22c55e" strokeWidth={2} label={{ value: 'Med', fill: '#22c55e', fontSize: 10 }} />
           <ReferenceLine x={q3} stroke="#2563eb" strokeDasharray="6 3" label={{ value: 'Q3', fill: '#2563eb', fontSize: 10 }} />
-          {/* Outlier fences */}
+          {}
           <ReferenceLine x={lowerFence} stroke="#e11d48" strokeDasharray="4 4" label={{ value: '↓Fence', fill: '#e11d48', fontSize: 9 }} />
           <ReferenceLine x={upperFence} stroke="#e11d48" strokeDasharray="4 4" label={{ value: '↑Fence', fill: '#e11d48', fontSize: 9 }} />
         </ComposedChart>
@@ -112,3 +109,4 @@ const BoxPlotChart = ({ data: propData }) => {
 };
 
 export default BoxPlotChart;
+

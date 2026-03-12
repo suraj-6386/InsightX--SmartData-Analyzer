@@ -4,18 +4,18 @@ import { useData } from '../context/DataContext';
 import { useStatistics } from '../hooks/useStatistics';
 import { useOutliers } from '../hooks/useOutliers';
 
-// Chart components
+
 import CorrelationMatrix from '../components/charts/CorrelationMatrix';
 import BoxPlotChart from '../components/charts/BoxPlotChart';
 import ScatterTrendlineChart from '../components/charts/ScatterTrendlineChart';
 import ForecastChart from '../components/charts/ForecastChart';
 
-// Analysis components
+
 import PivotTable from '../components/analysis/PivotTable';
 import FilterBuilder from '../components/analysis/FilterBuilder';
 import FormulaFields from '../components/analysis/FormulaFields';
 
-// ─── Stats Detail Table ────────────────────────────────────────────────────────
+
 const StatsDetailTable = ({ stats, numericColumns }) => {
   const [sortCol, setSortCol] = useState('mean');
   const metrics = ['count', 'mean', 'median', 'stdDev', 'variance', 'skewness', 'kurtosis', 'min', 'max', 'outlierCount'];
@@ -80,7 +80,7 @@ const StatsDetailTable = ({ stats, numericColumns }) => {
   );
 };
 
-// ─── Main Analysis Dashboard ───────────────────────────────────────────────────
+
 const TABS = [
   { id: 'statistics', label: '📊 Statistics' },
   { id: 'correlation', label: '🔗 Correlation' },
@@ -126,7 +126,7 @@ const AnalysisDashboard = () => {
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {}
       <div className="analysis-tabs">
         {TABS.map(tab => (
           <button
@@ -193,3 +193,4 @@ const AnalysisDashboard = () => {
 };
 
 export default AnalysisDashboard;
+

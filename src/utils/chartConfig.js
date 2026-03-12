@@ -27,10 +27,10 @@ export const aggregationOptions = [
 export const getChartConfigFields = (chartType) => {
   const fields = [];
 
-  // Common fields
+  
   fields.push({ key: 'title', label: 'Chart Title', type: 'text', required: true });
 
-  // Chart-specific fields
+  
   switch (chartType) {
     case 'pie':
     case 'donut':

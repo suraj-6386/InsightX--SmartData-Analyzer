@@ -50,7 +50,7 @@ export const detectColumnTypes = (data) => {
   columns.forEach(col => {
     const sampleValues = data.slice(0, Math.min(50, data.length)).map(row => row[col]);
 
-    // Check if numeric
+    
     const numericCount = sampleValues.filter(val => {
       const num = Number(val);
       return !isNaN(num) && val !== '' && isFinite(num);
@@ -59,7 +59,7 @@ export const detectColumnTypes = (data) => {
     if (numericCount / sampleValues.length > 0.8) {
       numeric.push(col);
     }
-    // Check if date
+    
     else if (sampleValues.some(val => {
       if (!val || typeof val !== 'string') return false;
       const date = new Date(val);
@@ -102,4 +102,39 @@ export const cleanData = (data, options = {}) => {
     data: cleanedData,
     results
   };
+};
+
+export const treatOutliers = (data, column, method) => {
+  const values = data.map(row => Number(row[column])).filter(v => !isNaN(v));
+  if (values.length === 0) return { data, treatedCount: 0 };
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const q1 = sorted[Math.floor(sorted.length * 0.25)];
+  const q3 = sorted[Math.floor(sorted.length * 0.75)];
+  const iqr = q3 - q1;
+  const lowerFence = q1 - 1.5 * iqr;
+  const upperFence = q3 + 1.5 * iqr;
+
+  let treatedCount = 0;
+  const cleaned = data.map(row => {
+    const newRow = { ...row };
+    const val = Number(row[column]);
+    if (!isNaN(val) && (val < lowerFence || val > upperFence)) {
+      treatedCount++;
+      if (method === 'remove') {
+        return null;
+      } else if (method === 'cap') {
+        newRow[column] = val < lowerFence ? lowerFence : upperFence;
+      } else if (method === 'mean') {
+        const meanVal = values.reduce((a, b) => a + b, 0) / values.length;
+        newRow[column] = meanVal;
+      } else if (method === 'median') {
+        newRow[column] = sorted[Math.floor(sorted.length / 2)];
+      }
+    }
+    return newRow;
+  });
+
+  const finalData = method === 'remove' ? cleaned.filter(r => r !== null) : cleaned;
+  return { data: finalData, treatedCount: method === 'remove' ? treatedCount : treatedCount };
 };

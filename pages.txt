@@ -1,0 +1,81 @@
+InsightX Pro — File Manifest
+
+CORE APPLICATION
+================
+src/App.jsx                      Main application shell with routing
+src/main.jsx                     Entry point
+src/index.css                    Global styles with Dark Red theme
+
+LAYOUT COMPONENTS
+=================
+src/components/layout/Topbar.jsx      Navigation bar with upload & theme controls
+src/components/layout/Sidebar.jsx     Side navigation with page links
+
+PAGE COMPONENTS
+===============
+src/pages/Dashboard.jsx           Main dashboard with auto-charts & data table
+src/pages/DataCleaning.jsx         Data cleaning page (imported from Dashboard)
+src/pages/Reports.jsx              PDF report generation page
+src/pages/AnalysisDashboard.jsx    Advanced analysis page
+
+UI COMPONENTS
+=============
+src/components/FileUpload.jsx      Drag-drop file upload component
+src/components/DataTable.jsx      Data table with pagination
+src/components/DataCleaningPanel.jsx  Data cleaning controls panel
+src/components/DatasetInfo.jsx     Dataset information display
+src/components/DatasetDescribe.jsx  Dataset statistics (describe)
+src/components/KPISection.jsx      KPI cards display
+src/components/SidebarControls.jsx Chart builder sidebar controls
+
+CHART COMPONENTS
+================
+src/components/charts/ChartBuilder.jsx       Main chart builder
+src/components/charts/AutoChartGrid.jsx     Auto-generated chart grid
+src/components/charts/BarChart.jsx          Bar chart component
+src/components/charts/LineChart.jsx         Line chart component
+src/components/charts/CategoryPieChart.jsx   Pie chart component
+src/components/charts/ScatterTrendlineChart.jsx  Scatter with regression
+src/components/charts/CorrelationMatrix.jsx  Correlation heatmap
+src/components/charts/BoxPlotChart.jsx       Box plot visualization
+src/components/charts/ForecastChart.jsx     Time series forecasting
+
+SERVICES
+========
+src/services/parserService.js      CSV/Excel file parsing
+src/services/pdfService.js         PDF report generation
+src/services/analysisService.js    KPI calculations
+
+CONTEXT
+=======
+src/context/DataContext.jsx       Global data state management
+
+UTILS
+=====
+src/utils/aggregationUtils.js      Data aggregation functions
+src/utils/chartConfig.js          Chart configuration presets
+src/utils/cleaningUtils.js         Data cleaning utilities
+src/utils/statisticsUtils.js       Statistical calculations
+src/utils/pivotUtils.js            Pivot table logic
+src/utils/forecastingUtils.js      Time series forecasting
+src/utils/regressionUtils.js       Regression analysis
+
+HOOKS
+=====
+src/hooks/useDataCleaning.js       Data cleaning hooks
+src/hooks/useDataProcessor.js      Data processing hooks
+src/hooks/useStatistics.js         Statistics computation
+src/hooks/useOutliers.js          Outlier detection
+src/hooks/usePivot.js             Pivot table hooks
+src/hooks/useCorrelation.js       Correlation computation
+src/hooks/useForecast.js          Forecasting hooks
+
+PUBLIC ASSETS
+=============
+public/icon.png                   Application icon
+
+CONFIGURATION
+=============
+package.json                      Dependencies & scripts
+vite.config.js                    Vite build configuration
+index.html                        HTML template

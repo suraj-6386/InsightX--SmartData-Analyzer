@@ -1,6 +1,4 @@
-/**
- * useOutliers.js — IQR-based outlier detection across all numeric columns.
- */
+
 import { useMemo } from 'react';
 import { detectOutliers, extractNumericValues, getNumericColumns } from '../utils/statisticsUtils';
 
@@ -19,3 +17,4 @@ export const useOutliers = (data) => {
         return { outliers, totalOutliers, numericColumns };
     }, [data]);
 };
+

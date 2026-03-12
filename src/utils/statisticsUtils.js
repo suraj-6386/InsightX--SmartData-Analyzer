@@ -1,12 +1,8 @@
-/**
- * statisticsUtils.js
- * Pure statistical computation functions for InsightX Pro Analytics Engine.
- * No dependencies — runs entirely client-side.
- */
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BASIC DESCRIPTIVE STATISTICS
-// ─────────────────────────────────────────────────────────────────────────────
+
+
+
+
 
 export const mean = (values) => {
     if (!values || values.length === 0) return 0;
@@ -43,14 +39,11 @@ export const stdDev = (values, population = false) => {
     return Math.sqrt(variance(values, population));
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SHAPE STATISTICS
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Skewness (Fisher's moment coefficient of skewness)
- * Formula: (n / ((n-1)(n-2))) * Σ((xi - x̄) / s)³
- */
+
+
+
+
 export const skewness = (values) => {
     const n = values.length;
     if (n < 3) return 0;
@@ -61,10 +54,7 @@ export const skewness = (values) => {
     return (n / ((n - 1) * (n - 2))) * cubedDeviations;
 };
 
-/**
- * Excess Kurtosis (Fisher's definition — normal distribution = 0)
- * Formula: [(n(n+1)) / ((n-1)(n-2)(n-3))] * Σ((xi - x̄)/s)⁴  −  [3(n-1)² / ((n-2)(n-3))]
- */
+
 export const kurtosis = (values) => {
     const n = values.length;
     if (n < 4) return 0;
@@ -77,9 +67,9 @@ export const kurtosis = (values) => {
     return term1 - term2;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// QUANTILES & PERCENTILES
-// ─────────────────────────────────────────────────────────────────────────────
+
+
+
 
 export const percentile = (values, p) => {
     const sorted = [...values].sort((a, b) => a - b);
@@ -96,15 +86,11 @@ export const quartiles = (values) => ({
     q3: percentile(values, 75),
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// OUTLIER DETECTION — IQR Method
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Returns IQR bounds and flags each value as outlier/normal.
- * Lower fence = Q1 - 1.5 * IQR
- * Upper fence = Q3 + 1.5 * IQR
- */
+
+
+
+
 export const detectOutliers = (values) => {
     const { q1, q3 } = quartiles(values);
     const iqr = q3 - q1;
@@ -124,14 +110,11 @@ export const detectOutliers = (values) => {
     };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FULL COLUMN SUMMARY
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * getColumnStats — computes all statistics for a numeric array.
- * Returns a rich summary object per column.
- */
+
+
+
+
 export const getColumnStats = (values) => {
     const cleaned = values.filter(v => v !== null && v !== undefined && !isNaN(v));
     if (cleaned.length === 0) return null;
@@ -157,7 +140,7 @@ export const getColumnStats = (values) => {
         q1, q2, q3,
         iqr: q3 - q1,
         ...outlierInfo,
-        // Interpretations
+        
         skewnessLabel: (() => {
             const sk = skewness(cleaned);
             if (Math.abs(sk) < 0.5) return 'Approximately Symmetric';
@@ -172,9 +155,9 @@ export const getColumnStats = (values) => {
     };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NUMERIC COLUMN EXTRACTOR
-// ─────────────────────────────────────────────────────────────────────────────
+
+
+
 
 export const extractNumericValues = (data, column) =>
     data
@@ -189,3 +172,4 @@ export const getNumericColumns = (data) => {
         return numericVals.length / vals.length >= 0.8;
     });
 };
+

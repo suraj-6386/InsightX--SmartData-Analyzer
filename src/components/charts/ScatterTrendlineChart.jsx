@@ -118,3 +118,4 @@ const ScatterTrendlineChart = ({ data: propData }) => {
 };
 
 export default ScatterTrendlineChart;
+

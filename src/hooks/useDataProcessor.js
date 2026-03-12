@@ -1,9 +1,6 @@
 import { useMemo } from 'react';
 
-/**
- * useDataProcessor — computes column-level statistics from a dataset.
- * Returns stats per numeric column + metadata about the dataset.
- */
+
 export function useDataProcessor(data) {
     return useMemo(() => {
         if (!data || data.length === 0) {
@@ -22,7 +19,7 @@ export function useDataProcessor(data) {
         const rowCount = data.length;
         const colCount = columns.length;
 
-        // Categorize columns
+        
         const numericColumns = columns.filter(col => {
             const vals = data.map(r => r[col]).filter(v => v !== null && v !== undefined && v !== '');
             if (vals.length === 0) return false;
@@ -32,7 +29,7 @@ export function useDataProcessor(data) {
 
         const categoricalColumns = columns.filter(col => !numericColumns.includes(col));
 
-        // Compute stats for each numeric column
+        
         const stats = {};
         numericColumns.forEach(col => {
             const values = data
@@ -47,25 +44,25 @@ export function useDataProcessor(data) {
             const min = values[0];
             const max = values[values.length - 1];
 
-            // Median
+            
             const mid = Math.floor(values.length / 2);
             const median = values.length % 2 !== 0
                 ? values[mid]
                 : (values[mid - 1] + values[mid]) / 2;
 
-            // Mode
+            
             const freq = {};
             values.forEach(v => { freq[v] = (freq[v] || 0) + 1; });
             const mode = Number(Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b));
 
-            // Std dev
+            
             const variance = values.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / values.length;
             const stdDev = Math.sqrt(variance);
 
             stats[col] = { mean, median, mode, min, max, stdDev, count: values.length, sum };
         });
 
-        // Missing values
+        
         let missingCount = 0;
         data.forEach(row => {
             columns.forEach(col => {
@@ -81,3 +78,4 @@ export function useDataProcessor(data) {
         return { rowCount, colCount, numericColumns, categoricalColumns, stats, missingCount, missingPercent };
     }, [data]);
 }
+

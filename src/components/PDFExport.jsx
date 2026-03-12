@@ -6,15 +6,15 @@ const PDFExport = ({ data, analysis }) => {
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    // Title
+    
     doc.setFontSize(20);
     doc.text('InsightX Analytics Report', 20, 20);
 
-    // Date
+    
     doc.setFontSize(12);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
 
-    // Summary Section
+    
     doc.setFontSize(16);
     doc.text('Dataset Summary', 20, 50);
     doc.setFontSize(12);
@@ -26,7 +26,7 @@ const PDFExport = ({ data, analysis }) => {
     doc.text(`Numeric Columns: ${analysis.numericColumns.length}`, 20, yPos);
     yPos += 10;
 
-    // KPIs
+    
     if (analysis.averages && analysis.averages.length > 0) {
       doc.setFontSize(14);
       doc.text('Key Metrics', 20, yPos + 10);
@@ -52,7 +52,7 @@ const PDFExport = ({ data, analysis }) => {
       });
     }
 
-    // Data Table
+    
     doc.setFontSize(16);
     doc.text('Data Preview', 20, yPos + 10);
     yPos += 20;

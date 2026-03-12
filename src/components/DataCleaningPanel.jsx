@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { treatOutliers } from '../utils/cleaningUtils';
 
 const DataCleaningPanel = ({ data, onDataClean }) => {
   const [showConvertModal, setShowConvertModal] = useState(false);
   const [showTreatNullModal, setShowTreatNullModal] = useState(false);
+  const [showOutlierModal, setShowOutlierModal] = useState(false);
   const [convertConfig, setConvertConfig] = useState({ column: '', targetType: '' });
   const [treatNullConfig, setTreatNullConfig] = useState({ treatment: '' });
+  const [outlierConfig, setOutlierConfig] = useState({ column: '', method: '' });
 
   const removeNulls = () => {
     const originalLength = data.length;
@@ -89,7 +92,7 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
         if (value === null || value === undefined || value === '' || value === 'null' || value === 'NULL') {
           switch (treatNullConfig.treatment) {
             case 'mean': {
-              // Only for numeric columns
+              
               const numericValues = data.map(r => r[col]).filter(v =>
                 v !== null && v !== undefined && v !== '' && v !== 'null' && v !== 'NULL' && !isNaN(Number(v))
               ).map(v => Number(v));
@@ -132,7 +135,7 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
               rowModified = true;
               break;
             case 'remove':
-              // This will be handled by filtering later
+              
               break;
             default:
               break;
@@ -144,7 +147,7 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
       return newRow;
     });
 
-    // If treatment is 'remove', filter out rows with null values
+    
     let finalData = cleaned;
     if (treatNullConfig.treatment === 'remove') {
       finalData = cleaned.filter(row => {
@@ -164,7 +167,25 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
     setTreatNullConfig({ treatment: '' });
   };
 
+  const handleTreatOutliers = () => {
+    if (!outlierConfig.column || !outlierConfig.method) {
+      alert('Please select both column and treatment method');
+      return;
+    }
+
+    const { data: cleaned, treatedCount } = treatOutliers(data, outlierConfig.column, outlierConfig.method);
+    onDataClean(cleaned, { column: outlierConfig.column, method: outlierConfig.method, treatedCount }, 'treatOutliers');
+
+    setShowOutlierModal(false);
+    setOutlierConfig({ column: '', method: '' });
+  };
+
   const columns = data ? Object.keys(data[0]) : [];
+  const numericColumns = columns.filter(col => {
+    const vals = data?.map(r => r[col]).filter(v => v !== null && v !== undefined && v !== '');
+    const numericVals = vals?.filter(v => !isNaN(Number(v)));
+    return numericVals && numericVals.length / vals.length >= 0.8;
+  });
 
   return (
     <div className="data-cleaning-panel">
@@ -197,9 +218,15 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
               🔧 Treat Null Values
             </button>
           </div>
+
+          <div className="col-md-6 col-lg-4">
+            <button className="btn btn-outline-danger w-100" onClick={() => setShowOutlierModal(true)}>
+              📊 Treat Outliers
+            </button>
+          </div>
         </div>
 
-        {/* Convert Data Type Modal */}
+        {}
         {showConvertModal && (
           <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
             <div className="modal-dialog">
@@ -246,7 +273,7 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
           </div>
         )}
 
-        {/* Treat Null Values Modal */}
+        {}
         {showTreatNullModal && (
           <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
             <div className="modal-dialog">
@@ -276,6 +303,52 @@ const DataCleaningPanel = ({ data, onDataClean }) => {
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowTreatNullModal(false)}>Cancel</button>
                   <button type="button" className="btn btn-primary" onClick={handleTreatNulls}>Apply Treatment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showOutlierModal && (
+          <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Treat Outliers (IQR Method)</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowOutlierModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="form-label">Select Numeric Column</label>
+                    <select
+                      className="form-select"
+                      value={outlierConfig.column}
+                      onChange={(e) => setOutlierConfig({...outlierConfig, column: e.target.value})}
+                    >
+                      <option value="">Choose column</option>
+                      {numericColumns.map(col => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Treatment Method</label>
+                    <select
+                      className="form-select"
+                      value={outlierConfig.method}
+                      onChange={(e) => setOutlierConfig({...outlierConfig, method: e.target.value})}
+                    >
+                      <option value="">Choose method</option>
+                      <option value="cap">Cap to Fence Values</option>
+                      <option value="remove">Remove Outlier Rows</option>
+                      <option value="mean">Replace with Mean</option>
+                      <option value="median">Replace with Median</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowOutlierModal(false)}>Cancel</button>
+                  <button type="button" className="btn btn-primary" onClick={handleTreatOutliers}>Apply Treatment</button>
                 </div>
               </div>
             </div>

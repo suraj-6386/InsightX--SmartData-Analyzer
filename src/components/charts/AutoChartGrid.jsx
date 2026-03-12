@@ -17,7 +17,7 @@ const AutoChartGrid = () => {
 
   if (!currentData || currentData.length === 0) return null;
 
-  // Build stats comparison bar chart for numeric columns
+  
   const statsBarData = numericColumns.slice(0, 6).map(col => {
     const s = stats[col] || {};
     return {
@@ -35,10 +35,10 @@ const AutoChartGrid = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, delay: 0.1 }}
     >
-      {/* KPI Stats Row */}
+      {}
       <SummaryStatsChart />
 
-      {/* Auto Charts Row */}
+      {}
       <div className="charts-row">
         <div className="chart-col-wide">
           <TrendLineChart />
@@ -48,7 +48,7 @@ const AutoChartGrid = () => {
         </div>
       </div>
 
-      {/* Column Stats Comparison */}
+      {}
       {statsBarData.length > 0 && (
         <ChartCard title="Column Statistics Comparison (Mean / Min / Max)">
           <ResponsiveContainer width="100%" height={260}>
@@ -76,3 +76,4 @@ const AutoChartGrid = () => {
 };
 
 export default AutoChartGrid;
+

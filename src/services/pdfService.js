@@ -1,78 +1,68 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-export const generatePDFReport = async (data, charts) => {
+export const generatePDFReport = async (data, chartImages, analysisStats) => {
   try {
     const doc = new jsPDF();
+    const primaryRed = [153, 27, 27]; 
 
-    // Title Page
-    doc.setFontSize(28);
+    doc.setFontSize(30);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(41, 128, 185);
+    doc.setTextColor(primaryRed[0], primaryRed[1], primaryRed[2]);
     doc.text('InsightX Analytics Report', 20, 50);
 
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    doc.text('Professional Data Analytics Dashboard', 20, 70);
+    doc.setTextColor(60, 60, 60);
+    doc.text('Professional Intelligence Data Insights', 20, 65);
+
+    doc.setDrawColor(primaryRed[0], primaryRed[1], primaryRed[2]);
+    doc.setLineWidth(1.5);
+    doc.line(20, 75, 190, 75);
 
     doc.setFontSize(12);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 20, 90);
-    doc.text(`Dataset: ${data.length.toLocaleString()} rows × ${Object.keys(data[0]).length} columns`, 20, 105);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 20, 95);
+    doc.text(`Dataset Scale: ${data.length.toLocaleString()} rows × ${Object.keys(data[0]).length} columns`, 20, 105);
 
-    // Dataset Information Page
     doc.addPage();
-    doc.setFontSize(20);
+    doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(41, 128, 185);
-    doc.text('📊 Dataset Information', 20, 30);
+    doc.setTextColor(primaryRed[0], primaryRed[1], primaryRed[2]);
+    doc.text('📊 Dataset Overview', 20, 30);
     doc.setTextColor(0, 0, 0);
 
     let yPos = 50;
 
-    // Basic info
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Overview:', 20, yPos);
-    yPos += 15;
+    doc.text('Summary Statistics:', 20, yPos);
+    yPos += 12;
 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Total Rows: ${data.length.toLocaleString()}`, 30, yPos);
+    doc.text(`Total Records: ${data.length.toLocaleString()}`, 30, yPos);
     yPos += 10;
-    doc.text(`Total Columns: ${Object.keys(data[0]).length}`, 30, yPos);
+    doc.text(`Total Dimensions: ${Object.keys(data[0]).length}`, 30, yPos);
     yPos += 10;
 
-    // Approximate memory usage
     const approxMemory = (data.length * Object.keys(data[0]).length * 8) / 1024;
-    doc.text(`Approximate Memory Usage: ~${approxMemory.toFixed(1)} KB`, 30, yPos);
+    doc.text(`Estimated Memory Footprint: ~${approxMemory.toFixed(1)} KB`, 30, yPos);
     yPos += 20;
 
-    // Column details
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Column Details:', 20, yPos);
-    yPos += 15;
+    doc.text('Column Taxonomy:', 20, yPos);
+    yPos += 12;
 
     const columns = Object.keys(data[0]);
     const columnInfo = columns.map(col => {
-      let dataType = 'object';
-      let missingCount = 0;
-
+      let dataType = 'string';
       const sampleValues = data.slice(0, Math.min(100, data.length)).map(row => row[col]);
       const numericValues = sampleValues.filter(val => !isNaN(Number(val)) && val !== '');
-      const dateValues = sampleValues.filter(val => {
-        const date = new Date(val);
-        return !isNaN(date.getTime()) && val !== '';
-      });
-
-      if (numericValues.length > sampleValues.length * 0.8) {
-        dataType = 'numeric';
-      } else if (dateValues.length > sampleValues.length * 0.8) {
-        dataType = 'date';
-      }
-
-      missingCount = data.filter(row => {
+      if (numericValues.length > sampleValues.length * 0.8) dataType = 'numeric';
+      
+      const missingCount = data.filter(row => {
         const val = row[col];
         return val === null || val === undefined || val === '' || val === 'null' || val === 'NULL';
       }).length;
@@ -81,181 +71,88 @@ export const generatePDFReport = async (data, charts) => {
     });
 
     doc.autoTable({
-      head: [['Column', 'Data Type', 'Missing', '% Missing']],
+      head: [['Column Name', 'Type', 'Null Count', '% Null']],
       body: columnInfo,
       startY: yPos,
       styles: { fontSize: 9, cellPadding: 3 },
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
+      headStyles: { fillColor: primaryRed, textColor: 255 },
+      alternateRowStyles: { fillColor: [250, 240, 240] },
       margin: { left: 20, right: 20 },
     });
 
-    // Statistics Page
-    doc.addPage();
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(41, 128, 185);
-    doc.text('📈 Dataset Statistics', 20, 30);
-    doc.setTextColor(0, 0, 0);
+    if (analysisStats) {
+      doc.addPage();
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(primaryRed[0], primaryRed[1], primaryRed[2]);
+      doc.text('🎭 Tone & Style Analysis', 20, 30);
+      doc.setTextColor(0, 0, 0);
+      yPos = 50;
 
-    yPos = 50;
-
-    // Get numeric columns
-    const numericColumns = columns.filter(col => {
-      return data.every(row => {
-        const val = row[col];
-        return val !== null && val !== undefined && val !== '' && !isNaN(Number(val));
-      });
-    });
-
-    if (numericColumns.length > 0) {
-      const statistics = numericColumns.map(col => {
-        const values = data.map(row => Number(row[col])).filter(val => !isNaN(val)).sort((a, b) => a - b);
-        const count = values.length;
-
-        if (count === 0) return null;
-
-        const sum = values.reduce((a, b) => a + b, 0);
-        const mean = sum / count;
-        const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / count;
-        const std = Math.sqrt(variance);
-
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-
-        const getPercentile = (arr, p) => {
-          const index = (p / 100) * (arr.length - 1);
-          const lower = Math.floor(index);
-          const upper = Math.ceil(index);
-          const weight = index % 1;
-
-          if (upper >= arr.length) return arr[arr.length - 1];
-          return arr[lower] * (1 - weight) + arr[upper] * weight;
-        };
-
-        const percentile25 = getPercentile(values, 25);
-        const percentile50 = getPercentile(values, 50);
-        const percentile75 = getPercentile(values, 75);
-
-        return [
-          col,
-          count,
-          mean.toFixed(2),
-          std.toFixed(2),
-          min.toFixed(2),
-          percentile25.toFixed(2),
-          percentile50.toFixed(2),
-          percentile75.toFixed(2),
-          max.toFixed(2)
-        ];
-      }).filter(stat => stat !== null);
+      const toneData = Object.entries(analysisStats).map(([col, s]) => [
+        col,
+        s.skewnessLabel || 'N/A',
+        s.kurtosisLabel || 'N/A',
+        s.skewness?.toFixed(3) || '0.000',
+        s.kurtosis?.toFixed(3) || '0.000'
+      ]);
 
       doc.autoTable({
-        head: [['Column', 'Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']],
-        body: statistics,
+        head: [['Dimension', 'Distribution Tone', 'Tail Style', 'Skewness', 'Kurtosis']],
+        body: toneData,
         startY: yPos,
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-        alternateRowStyles: { fillColor: [245, 245, 245] },
-        margin: { left: 20, right: 20 },
+        styles: { fontSize: 9, cellPadding: 4 },
+        headStyles: { fillColor: primaryRed, textColor: 255 },
+        alternateRowStyles: { fillColor: [250, 240, 240] },
       });
-    } else {
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text('No numeric columns found for statistical analysis.', 20, yPos);
     }
 
-    // Data Preview Page
+    if (chartImages && chartImages.length > 0) {
+      chartImages.forEach((imgData, idx) => {
+        doc.addPage();
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(primaryRed[0], primaryRed[1], primaryRed[2]);
+        doc.text(`📉 Visual Intelligence — Chart ${idx + 1}`, 20, 30);
+        
+        try {
+          doc.addImage(imgData, 'PNG', 15, 50, 180, 100, undefined, 'FAST');
+        } catch (e) {
+          console.error('Error adding image to PDF:', e);
+        }
+      });
+    }
+
     doc.addPage();
-    doc.setFontSize(20);
+    doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(41, 128, 185);
-    doc.text('📋 Data Preview', 20, 30);
+    doc.setTextColor(primaryRed[0], primaryRed[1], primaryRed[2]);
+    doc.text('📋 Data Exploration Preview', 20, 30);
     doc.setTextColor(0, 0, 0);
-
-    yPos = 50;
-
-    const previewRows = data.slice(0, 20).map(row =>
-      columns.map(col => String(row[col] || ''))
-    );
 
     doc.autoTable({
       head: [columns],
-      body: previewRows,
-      startY: yPos,
+      body: data.slice(0, 25).map(row => columns.map(col => String(row[col] || ''))),
+      startY: 50,
       styles: { fontSize: 7, cellPadding: 2 },
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-      margin: { left: 20, right: 20 },
+      headStyles: { fillColor: primaryRed, textColor: 255 },
+      alternateRowStyles: { fillColor: [250, 240, 240] },
     });
 
-    // Charts Page
-    if (charts && charts.length > 0) {
-      doc.addPage();
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(41, 128, 185);
-      doc.text('📊 Dashboard Charts', 20, 30);
-      doc.setTextColor(0, 0, 0);
-
-      yPos = 50;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Total Charts Created: ${charts.length}`, 20, yPos);
-      yPos += 20;
-
-      charts.forEach((chart, index) => {
-        if (yPos > 250) {
-          doc.addPage();
-          yPos = 30;
-        }
-
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`${index + 1}. ${chart.title}`, 20, yPos);
-        yPos += 12;
-
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Type: ${chart.type.charAt(0).toUpperCase() + chart.type.slice(1)}`, 30, yPos);
-        yPos += 8;
-        doc.text(`X-Axis: ${chart.xAxis || 'Not set'}`, 30, yPos);
-        yPos += 8;
-        doc.text(`Y-Axis: ${chart.yAxis || 'Not set'}`, 30, yPos);
-        yPos += 8;
-        if (chart.legend) {
-          doc.text(`Legend: ${chart.legend}`, 30, yPos);
-          yPos += 8;
-        }
-        if (chart.aggregation && chart.aggregation !== 'sum') {
-          doc.text(`Aggregation: ${chart.aggregation}`, 30, yPos);
-          yPos += 8;
-        }
-        yPos += 10;
-      });
-    }
-
-    // Footer on all pages
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
-      doc.setFontSize(8);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'italic');
-      doc.setTextColor(128, 128, 128);
-      doc.text('Generated by InsightX - Professional Data Analytics Platform', 20, doc.internal.pageSize.height - 20);
-      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 50, doc.internal.pageSize.height - 20);
-      doc.text(new Date().toLocaleString(), doc.internal.pageSize.width - 50, doc.internal.pageSize.height - 15);
+      doc.setTextColor(150, 150, 150);
+      doc.text('InsightX Intelligence - Data Analysis Platform', 20, doc.internal.pageSize.height - 15);
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 15);
     }
 
-    // Save the PDF
-    doc.save(`insightx-report-${new Date().toISOString().split('T')[0]}.pdf`);
-
-    // Show success message
-    alert('✅ PDF Report generated successfully!');
+    doc.save(`insightx-pro-report-${new Date().getTime()}.pdf`);
 
   } catch (error) {
-    console.error('PDF Generation Error:', error);
-    alert('❌ Error generating PDF report. Please try again.');
+    console.error('PDF Generation Engine Failure:', error);
+    throw error;
   }
 };

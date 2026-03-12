@@ -16,7 +16,7 @@ const DataAnalysis = ({ data }) => {
     return { column: col, average: (sum / totalRows).toFixed(2) };
   });
 
-  // Simple top category for first non-numeric column
+  
   const nonNumericColumns = columns.filter(col => !numericColumns.includes(col));
   let topCategory = null;
   if (nonNumericColumns.length > 0) {

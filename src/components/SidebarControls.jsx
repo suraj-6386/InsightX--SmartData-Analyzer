@@ -42,7 +42,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
   const columns = data ? Object.keys(data[0]) : [];
   const numericColumns = columns.filter(col => {
     if (!data || data.length === 0) return false;
-    // Check if at least 80% of non-empty values are numeric
+    
     const values = data.map(row => row[col]).filter(val => val !== null && val !== undefined && val !== '');
     const numericValues = values.filter(val => !isNaN(Number(val)) && val !== '');
     return numericValues.length / values.length >= 0.8;
@@ -51,7 +51,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
 
   const handleChartTypeChange = (newType) => {
     setChartType(newType);
-    // Reset config when chart type changes
+    
     const defaultConfig = {
       xAxis: '',
       yAxis: '',
@@ -90,7 +90,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       return;
     }
 
-    // Validate required fields based on chart type
+    
     const requiredFields = getRequiredFields(chartType);
     const missingFields = requiredFields.filter(field => !chartConfig[field]);
 
@@ -104,7 +104,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       ...chartConfig
     });
 
-    // Reset form
+    
     setChartConfig({
       title: '',
       xAxis: '',
@@ -156,7 +156,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
   const renderConfigFields = () => {
     const fields = [];
 
-    // Basic Configuration
+    
     fields.push(
       renderFieldGroup('📝 Basic Settings', [
         <div key="title" className="mb-3">
@@ -172,10 +172,10 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       ])
     );
 
-    // Data Fields Configuration
+    
     const dataFields = [];
 
-    // X-Axis (required for most charts)
+    
     if (!['pie', 'donut'].includes(chartType)) {
       dataFields.push(
         <div key="xAxis" className="mb-3">
@@ -196,7 +196,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Y-Axis (required for most charts)
+    
     if (!['heatmap', 'radar'].includes(chartType)) {
       dataFields.push(
         <div key="yAxis" className="mb-3">
@@ -215,7 +215,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Category field for circular charts
+    
     if (['pie', 'donut'].includes(chartType)) {
       dataFields.push(
         <div key="xAxis" className="mb-3">
@@ -247,7 +247,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Legend field for multi-series charts
+    
     if (['stackedBar', 'multiLine', 'radar', 'combo'].includes(chartType)) {
       dataFields.push(
         <div key="legend" className="mb-3">
@@ -266,7 +266,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Size field for bubble/scatter
+    
     if (['scatter', 'bubble'].includes(chartType)) {
       dataFields.push(
         <div key="size" className="mb-3">
@@ -285,7 +285,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Color field for grouping
+    
     if (['scatter', 'bubble', 'heatmap'].includes(chartType)) {
       dataFields.push(
         <div key="color" className="mb-3">
@@ -308,7 +308,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       fields.push(renderFieldGroup('📊 Data Fields', dataFields));
     }
 
-    // Aggregation & Calculation
+    
     if (['bar', 'line', 'area', 'stackedBar', 'multiLine', 'histogram', 'combo'].includes(chartType)) {
       fields.push(
         renderFieldGroup('🧮 Aggregation', [
@@ -331,10 +331,10 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Chart-specific options
+    
     const chartOptions = [];
 
-    // Orientation for bar charts
+    
     if (['bar', 'stackedBar'].includes(chartType)) {
       chartOptions.push(
         <div key="orientation" className="mb-3">
@@ -351,7 +351,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Smooth line option
+    
     if (['line', 'area', 'multiLine'].includes(chartType)) {
       chartOptions.push(
         <div key="smooth" className="form-check mb-3">
@@ -369,7 +369,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Stack option for area charts
+    
     if (['area', 'stackedBar'].includes(chartType)) {
       chartOptions.push(
         <div key="stack" className="form-check mb-3">
@@ -387,7 +387,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Radius for circular charts
+    
     if (['pie', 'donut'].includes(chartType)) {
       chartOptions.push(
         <div key="radius" className="mb-3">
@@ -405,7 +405,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Inner radius for donut
+    
     if (chartType === 'donut') {
       chartOptions.push(
         <div key="innerRadius" className="mb-3">
@@ -423,7 +423,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       );
     }
 
-    // Bin count for histogram
+    
     if (chartType === 'histogram') {
       chartOptions.push(
         <div key="binCount" className="mb-3">
@@ -445,7 +445,7 @@ const SidebarControls = ({ data, onAddChart, selectedChart, onUpdateChart }) => 
       fields.push(renderFieldGroup('⚙️ Chart Options', chartOptions));
     }
 
-    // Display options
+    
     fields.push(
       renderFieldGroup('👁️ Display Options', [
         <div key="showLegend" className="form-check mb-3">

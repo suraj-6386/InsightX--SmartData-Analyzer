@@ -1,21 +1,10 @@
-/**
- * pivotUtils.js
- * GroupBy, dynamic aggregations, multi-criteria filtering,
- * and safe formula/calculated-column evaluation.
- */
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PIVOT / GROUP-BY ENGINE
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * groupBy — groups rows by a dimension column and applies aggregation.
- * @param {Array} data — dataset rows
- * @param {string} groupCol — column to group by
- * @param {string} valueCol — column to aggregate
- * @param {'sum'|'count'|'avg'|'min'|'max'|'countDistinct'} aggFunc
- * @returns {Array} [{group, value}]
- */
+
+
+
+
+
 export const groupBy = (data, groupCol, valueCol, aggFunc = 'sum') => {
     if (!data || !groupCol) return [];
 
@@ -46,15 +35,7 @@ export const groupBy = (data, groupCol, valueCol, aggFunc = 'sum') => {
     }).sort((a, b) => b.value - a.value);
 };
 
-/**
- * buildPivotTable — multi-dimensional pivot.
- * @param {Array} data
- * @param {string} rowDim — row dimension column
- * @param {string} colDim — column dimension column
- * @param {string} valueCol — value to aggregate
- * @param {string} aggFunc
- * @returns {{ rows, cols, cells }} pivot matrix
- */
+
 export const buildPivotTable = (data, rowDim, colDim, valueCol, aggFunc = 'sum') => {
     if (!data || !rowDim || !valueCol) return { rows: [], cols: [], cells: {} };
 
@@ -88,18 +69,11 @@ export const buildPivotTable = (data, rowDim, colDim, valueCol, aggFunc = 'sum')
     return { rows: rowKeys, cols: colKeys, cells };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MULTI-CRITERIA FILTERING ENGINE
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Filter condition shape:
- * { column, operator, value, type: 'numeric'|'string' }
- * Operators: '>', '<', '>=', '<=', '=', '!=', 'contains', 'startsWith', 'endsWith'
- *
- * Rule groups joined by AND or OR.
- * filterGroups: [{ logic: 'AND'|'OR', conditions: [...] }]
- */
+
+
+
+
 export const applyFilter = (data, conditions, groupLogic = 'AND') => {
     if (!conditions || conditions.length === 0) return data;
 
@@ -132,43 +106,32 @@ const evaluateCondition = (row, { column, operator, value }) => {
     }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SAFE FORMULA / CALCULATED COLUMN EVALUATOR
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Safely evaluates a user-supplied formula against a data row.
- * Columns are substituted as variables. Uses Function constructor with
- * a strict allowlist of operations — no arbitrary JS execution.
- *
- * Example formula: "Revenue - Expenses"  →  row.Revenue - row.Expenses
- *
- * @param {Object} row — single data row
- * @param {string} formula — user-supplied expression (column names as variables)
- * @param {string[]} columns — all column names (for substitution)
- * @returns {number|string} computed value
- */
+
+
+
+
 export const evaluateFormula = (row, formula, columns) => {
     try {
-        // Sort by length descending to avoid partial name replacement
+        
         const sortedCols = [...columns].sort((a, b) => b.length - a.length);
 
-        // Replace column names with their numeric values
+        
         let expr = formula;
         sortedCols.forEach(col => {
             const val = Number(row[col]);
             const safeVal = isNaN(val) ? 0 : val;
-            // Replace whole-word occurrences of the column name
+            
             expr = expr.replace(new RegExp(`\\b${col.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g'), safeVal);
         });
 
-        // Allow only safe math characters
+        
         if (!/^[\d\s+\-*/().,^%]+$/.test(expr)) return 'Invalid formula';
 
-        // Replace ^ with ** for exponentiation
+        
         expr = expr.replace(/\^/g, '**');
 
-        // eslint-disable-next-line no-new-func
+        
         const result = Function(`"use strict"; return (${expr})`)();
         return isNaN(result) ? 'Error' : +result.toFixed(4);
     } catch {
@@ -176,10 +139,7 @@ export const evaluateFormula = (row, formula, columns) => {
     }
 };
 
-/**
- * addCalculatedColumn — applies a formula to the whole dataset.
- * Returns a new dataset with the new column appended.
- */
+
 export const addCalculatedColumn = (data, newColName, formula) => {
     if (!data || !newColName || !formula) return data;
     const columns = data.length > 0 ? Object.keys(data[0]) : [];
@@ -188,3 +148,4 @@ export const addCalculatedColumn = (data, newColName, formula) => {
         [newColName]: evaluateFormula(row, formula, columns),
     }));
 };
+

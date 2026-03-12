@@ -16,15 +16,15 @@ const TrendLineChart = () => {
 
   if (!currentData || currentData.length === 0) return null;
 
-  // Pick X axis: prefer categorical, else first column
+  
   const columns = Object.keys(currentData[0]);
   const xCol = categoricalColumns[0] || columns[0];
 
-  // Pick numeric columns to plot (up to 4)
+  
   const plotCols = numericColumns.slice(0, 4);
   const activePlot = selectedY ? [selectedY] : plotCols.slice(0, 2);
 
-  // Aggregate: group by xCol, average numeric cols (limit 40 points for readability)
+  
   const grouped = {};
   currentData.forEach(row => {
     const key = String(row[xCol] ?? 'N/A').substring(0, 20);
@@ -46,7 +46,7 @@ const TrendLineChart = () => {
     return entry;
   });
 
-  // Limit to 40 data points
+  
   if (chartData.length > 40) chartData = chartData.slice(0, 40);
 
   const rightSlot = plotCols.length > 1 && (
@@ -101,3 +101,4 @@ const TrendLineChart = () => {
 };
 
 export default TrendLineChart;
+

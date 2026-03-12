@@ -1,10 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
-/**
- * StatCard — Animated KPI metric card with counter animation.
- * Props: icon, label, value (number or string), color (CSS color), subtitle
- */
+
 const StatCard = ({ icon, label, value, color = 'var(--primary-color)', subtitle, delay = 0 }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const isNumeric = typeof value === 'number';
@@ -20,7 +17,7 @@ const StatCard = ({ icon, label, value, color = 'var(--primary-color)', subtitle
       if (!startTime.current) startTime.current = timestamp;
       const elapsed = timestamp - startTime.current;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
+      
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplayValue(Math.floor(eased * value));
       if (progress < 1) {
@@ -65,3 +62,4 @@ const StatCard = ({ icon, label, value, color = 'var(--primary-color)', subtitle
 };
 
 export default StatCard;
+

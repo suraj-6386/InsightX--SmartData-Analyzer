@@ -18,12 +18,12 @@ const DatasetInfo = ({ data }) => {
   const totalRows = data.length;
   const totalColumns = columns.length;
 
-  // Detect data types and missing values
+  
   const columnInfo = columns.map(col => {
     let dataType = 'object';
     let missingCount = 0;
 
-    // Check data type
+    
     const sampleValues = data.slice(0, Math.min(100, data.length)).map(row => row[col]);
     const numericValues = sampleValues.filter(val => !isNaN(Number(val)) && val !== '');
     const dateValues = sampleValues.filter(val => {
@@ -37,7 +37,7 @@ const DatasetInfo = ({ data }) => {
       dataType = 'date';
     }
 
-    // Count missing values
+    
     missingCount = data.filter(row => {
       const val = row[col];
       return val === null || val === undefined || val === '' || val === 'null' || val === 'NULL';
@@ -51,8 +51,8 @@ const DatasetInfo = ({ data }) => {
     };
   });
 
-  // Calculate approximate memory usage
-  const approxMemoryUsage = (totalRows * totalColumns * 8) / 1024; // Rough estimate in KB
+  
+  const approxMemoryUsage = (totalRows * totalColumns * 8) / 1024; 
 
   return (
     <div className="card">

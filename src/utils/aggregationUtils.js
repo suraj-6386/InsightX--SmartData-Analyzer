@@ -7,7 +7,7 @@ export const aggregateData = (data, groupByField, valueField, aggregation = 'sum
     const groupKey = row[groupByField];
     const value = Number(row[valueField]);
 
-    if (isNaN(value)) return; // Skip non-numeric values
+    if (isNaN(value)) return; 
 
     if (!grouped[groupKey]) {
       grouped[groupKey] = [];

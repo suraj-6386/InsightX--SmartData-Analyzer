@@ -31,7 +31,7 @@ const ForecastChart = ({ data: propData }) => {
 
   const { series, trendInfo } = useForecast(data, activeX, activeY, forecastN, smaWindow);
 
-  // Goal seeking correlations
+  
   const goalResults = showGoalSeek
     ? goalSeek(
         Object.fromEntries(numericColumns.filter(c => c !== activeY).map(c => [
@@ -82,23 +82,23 @@ const ForecastChart = ({ data: propData }) => {
           <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
           <Tooltip contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-primary)' }} />
           <Legend wrapperStyle={{ color: 'var(--text-muted)', fontSize: '12px' }} />
-          {/* Historical actual */}
+          {}
           <Line type="monotone" dataKey="actual" stroke="var(--primary-color)" strokeWidth={2} dot={{ r: 3 }} name="Actual" connectNulls />
-          {/* SMA smoothed */}
+          {}
           <Line type="monotone" dataKey="sma" stroke="#2563eb" strokeWidth={1.5} strokeDasharray="5 3" dot={false} name="SMA" connectNulls />
-          {/* Regression trend */}
+          {}
           <Line type="monotone" dataKey="trend" stroke="#d97706" strokeDasharray="4 4" strokeWidth={1.5} dot={false} name="Trend" connectNulls />
-          {/* Forecast line */}
+          {}
           <Line type="monotone" dataKey="forecast" stroke="#22c55e" strokeWidth={2.5} strokeDasharray="6 3" dot={{ r: 4, fill: '#22c55e' }} name="Forecast" connectNulls />
-          {/* Confidence interval band */}
+          {}
           <Area type="monotone" dataKey="upper" stroke="none" fill="#22c55e" fillOpacity={0.1} name="Upper CI" connectNulls />
           <Area type="monotone" dataKey="lower" stroke="none" fill="#22c55e" fillOpacity={0.05} name="Lower CI" connectNulls />
-          {/* Divider between historical and forecast */}
+          {}
           <ReferenceLine x={series[histCount - 1]?.label} stroke="#e11d48" strokeDasharray="6 3" label={{ value: 'Forecast →', fill: '#e11d48', fontSize: 10 }} />
         </ComposedChart>
       </ResponsiveContainer>
 
-      {/* Goal Seeking Section */}
+      {}
       <div className="goal-seek-section">
         <button className="chart-mini-btn" onClick={() => setShowGoalSeek(!showGoalSeek)}>
           🎯 {showGoalSeek ? 'Hide' : 'Show'} Goal Seek
@@ -133,3 +133,4 @@ const ForecastChart = ({ data: propData }) => {
 };
 
 export default ForecastChart;
+
